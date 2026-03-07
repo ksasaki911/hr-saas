@@ -1,0 +1,640 @@
+// =============================================================
+// スーパーマーケット HR SaaS - Prismaスキーマ
+// マルチテナント対応（全テーブルにtenant_idを付与）
+// =============================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================
+// テナント管理
+// =============================================================
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String   // 企業名
+  subdomain   String   @unique // サブドメイン（例: "abc-super"）
+  plan        String   @default("standard") // standard / premium
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  stores      Store[]
+  departments Department[]
+  employees   Employee[]
+  users       User[]
+  positions   Position[]
+  shifts      Shift[]
+  shiftRequests ShiftRequest[]
+  shiftPatterns ShiftPattern[]
+  staffingRequirements StaffingRequirement[]
+  attendanceRecords AttendanceRecord[]
+  dailyAttendanceSummaries DailyAttendanceSummary[]
+  monthlyAttendanceSummaries MonthlyAttendanceSummary[]
+  leaveRequests LeaveRequest[]
+  companyCalendars CompanyCalendar[]
+  employmentRules EmploymentRule[]
+  attendanceProfiles AttendanceProfile[]
+  departmentSkillRequirements DepartmentSkillRequirement[]
+  headquartersSupports HeadquartersSupport[]
+
+  @@map("tenants")
+}
+
+// =============================================================
+// 認証・ユーザー管理
+// =============================================================
+model User {
+  id            String    @id @default(uuid())
+  tenantId      String
+  employeeId    String?   @unique
+  email         String
+  passwordHash  String
+  role          UserRole  @default(STORE_STAFF)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  employee Employee? @relation(fields: [employeeId], references: [id])
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+enum UserRole {
+  SYSTEM_ADMIN    // システム管理者（SaaS運営側）
+  TENANT_ADMIN    // テナント管理者（本部）
+  AREA_MANAGER    // エリアマネージャー
+  STORE_MANAGER   // 店長
+  ASSISTANT_MANAGER // 副店長
+  STORE_STAFF     // 一般スタッフ
+}
+
+// =============================================================
+// 組織マスタ
+// =============================================================
+model Store {
+  id           String   @id @default(uuid())
+  tenantId     String
+  code         String   // 店舗コード
+  name         String
+  address      String?
+  phone        String?
+  openTime     String   @default("09:00") // 営業開始時刻
+  closeTime    String   @default("22:00") // 営業終了時刻
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  employees   Employee[]
+  shifts      Shift[]
+  shiftRequests ShiftRequest[]
+  shiftPatterns ShiftPattern[]
+  staffingRequirements StaffingRequirement[]
+  attendanceRecords AttendanceRecord[]
+  dailyAttendanceSummaries DailyAttendanceSummary[]
+  companyCalendars CompanyCalendar[]
+  attendanceProfiles AttendanceProfile[]
+  headquartersSupports HeadquartersSupport[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@map("stores")
+}
+
+model Department {
+  id         String   @id @default(uuid())
+  tenantId   String
+  code       String   // 部門コード
+  name       String   // 青果、鮮魚、精肉、惣菜、ベーカリー、グロサリー、レジ、etc.
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  employees Employee[]
+  shifts    Shift[]
+  staffingRequirements StaffingRequirement[]
+  skillRequirements DepartmentSkillRequirement[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@map("departments")
+}
+
+model Position {
+  id        String   @id @default(uuid())
+  tenantId  String
+  name      String   // 店長、副店長、チーフ、パートリーダー、パート、アルバイト
+  level     Int      @default(0) // 職位レベル（権限制御用）
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  employees Employee[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("positions")
+}
+
+// =============================================================
+// 従業員マスタ
+// =============================================================
+model Employee {
+  id              String         @id @default(uuid())
+  tenantId        String
+  code            String         // 社員番号
+  lastName        String
+  firstName       String
+  lastNameKana    String?
+  firstNameKana   String?
+  email           String?
+  phone           String?
+  employmentType  EmploymentType
+  storeId         String
+  departmentId    String?
+  positionId      String?
+  hireDate        DateTime
+  terminationDate DateTime?
+  hourlyWage      Int?           // 時給（パート・アルバイト用）
+  monthlySalary   Int?           // 月給（正社員用）
+  maxHoursPerWeek Float?         // 週最大勤務時間（PA用）
+  canWorkDepts    String[]       // 対応可能な部門IDリスト（ヘルプ要員用）
+  skills          String[]       // 保有スキルタグ
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  store      Store       @relation(fields: [storeId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+  position   Position?   @relation(fields: [positionId], references: [id])
+  user       User?
+  shifts     Shift[]
+  shiftRequests ShiftRequest[]
+  shiftPatterns ShiftPattern[]
+  attendanceRecords AttendanceRecord[]
+  monthlyAttendanceSummaries MonthlyAttendanceSummary[]
+  leaveRequests LeaveRequest[]
+  attendanceProfile AttendanceProfile?
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([tenantId, storeId])
+  @@map("employees")
+}
+
+enum EmploymentType {
+  FULL_TIME   // 正社員
+  PART_TIME   // パートタイマー
+  ARBEIT      // アルバイト
+  CONTRACT    // 契約社員
+}
+
+// =============================================================
+// シフト管理（Phase 1 コア機能）
+// =============================================================
+
+// 必要人員マスタ（部門×時間帯ごとの必要人数）
+model StaffingRequirement {
+  id           String   @id @default(uuid())
+  tenantId     String
+  storeId      String
+  departmentId String
+  dayOfWeek    Int      // 0=日, 1=月, ... 6=土
+  timeSlot     String   // "09:00-12:00", "12:00-15:00" etc.
+  minStaff     Int      // 最低必要人数
+  idealStaff   Int      // 理想人数
+  isHoliday    Boolean  @default(false) // 祝日用フラグ
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  store      Store      @relation(fields: [storeId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@index([tenantId, storeId])
+  @@map("staffing_requirements")
+}
+
+// シフト希望（従業員からの希望提出）
+model ShiftRequest {
+  id          String       @id @default(uuid())
+  tenantId    String
+  employeeId  String
+  storeId     String
+  targetDate  DateTime     @db.Date
+  requestType ShiftRequestType
+  startTime   String?      // 希望開始時刻（AVAILABLE時）
+  endTime     String?      // 希望終了時刻（AVAILABLE時）
+  note        String?      // 備考
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, employeeId, targetDate])
+  @@index([tenantId, storeId, targetDate])
+  @@map("shift_requests")
+}
+
+enum ShiftRequestType {
+  AVAILABLE   // 出勤可能
+  UNAVAILABLE // 出勤不可
+  PREFERRED   // 出勤希望
+}
+
+// 月間シフトパターン（毎月繰り返す曜日別の希望）
+model ShiftPattern {
+  id          String       @id @default(uuid())
+  tenantId    String
+  employeeId  String
+  storeId     String
+  dayOfWeek   Int          // 0=日, 1=月, ..., 6=土
+  requestType ShiftRequestType
+  startTime   String?      // 希望開始時刻
+  endTime     String?      // 希望終了時刻
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, employeeId, dayOfWeek])
+  @@index([tenantId, storeId])
+  @@map("shift_patterns")
+}
+
+// シフト（確定シフト）
+model Shift {
+  id            String      @id @default(uuid())
+  tenantId      String
+  employeeId    String
+  storeId       String
+  departmentId  String?
+  shiftDate     DateTime    @db.Date
+  startTime     String      // "09:00"
+  endTime       String      // "17:00"
+  breakMinutes  Int         @default(60)
+  status        ShiftStatus @default(DRAFT)
+  isHelpShift   Boolean     @default(false) // 他店舗応援フラグ
+  laborCost     Int?        // この枠の人件費（自動計算）
+  note          String?
+  approvedBy    String?     // 承認者ID
+  approvedAt    DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  employee   Employee    @relation(fields: [employeeId], references: [id])
+  store      Store       @relation(fields: [storeId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+  attendanceRecord AttendanceRecord?
+
+  @@index([tenantId, storeId, shiftDate])
+  @@index([tenantId, employeeId, shiftDate])
+  @@map("shifts")
+}
+
+enum ShiftStatus {
+  DRAFT      // 草案
+  PUBLISHED  // 公開済み（従業員に通知済み）
+  CONFIRMED  // 確定
+  CHANGED    // 変更あり
+}
+
+// =============================================================
+// 勤怠管理（Phase 2）
+// =============================================================
+
+// 打刻記録（出退勤の実績）
+model AttendanceRecord {
+  id                 String           @id @default(uuid())
+  tenantId           String
+  employeeId         String
+  storeId            String
+  shiftId            String?  @unique  // 紐付くシフト（あれば）
+  attendanceDate     DateTime         @db.Date
+  clockIn            DateTime?        // 出勤打刻時刻
+  clockOut           DateTime?        // 退勤打刻時刻
+  breakStartTime     String?          // 休憩開始 "12:00"
+  breakEndTime       String?          // 休憩終了 "13:00"
+  actualBreakMinutes Int              @default(0)  // 実休憩分数
+  status             AttendanceStatus @default(PENDING)
+  lateMinutes        Int              @default(0)  // 遅刻分数
+  earlyLeaveMinutes  Int              @default(0)  // 早退分数
+  overtimeMinutes    Int              @default(0)  // 残業分数
+  totalWorkMinutes   Int              @default(0)  // 実労働分数
+  laborCost          Int?             // 実人件費
+  note               String?
+  approvedBy         String?
+  approvedAt         DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+  shift    Shift?   @relation(fields: [shiftId], references: [id])
+
+  @@unique([tenantId, employeeId, attendanceDate])
+  @@index([tenantId, storeId, attendanceDate])
+  @@index([tenantId, employeeId, attendanceDate])
+  @@map("attendance_records")
+}
+
+enum AttendanceStatus {
+  PENDING      // 未打刻（シフトあり・打刻なし）
+  CLOCKED_IN   // 出勤済み（退勤前）
+  CLOCKED_OUT  // 退勤済み
+  ABSENT       // 欠勤
+  LATE         // 遅刻あり
+  EARLY_LEAVE  // 早退あり
+  APPROVED     // 承認済み
+}
+
+// 日次勤怠集計
+model DailyAttendanceSummary {
+  id                String   @id @default(uuid())
+  tenantId          String
+  storeId           String
+  summaryDate       DateTime @db.Date
+  totalEmployees    Int      @default(0)  // シフト対象者数
+  totalPresent      Int      @default(0)  // 出勤者数
+  totalAbsent       Int      @default(0)  // 欠勤者数
+  totalLate         Int      @default(0)  // 遅刻者数
+  totalEarlyLeave   Int      @default(0)  // 早退者数
+  totalWorkHours    Float    @default(0)  // 総労働時間
+  totalOvertimeHours Float   @default(0)  // 総残業時間
+  totalLaborCost    Int      @default(0)  // 総人件費
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  store  Store  @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, storeId, summaryDate])
+  @@index([tenantId, storeId])
+  @@map("daily_attendance_summaries")
+}
+
+// 月次勤怠集計（従業員別）
+model MonthlyAttendanceSummary {
+  id                  String   @id @default(uuid())
+  tenantId            String
+  employeeId          String
+  yearMonth           String   // "2026-03"
+  totalWorkDays       Int      @default(0)
+  totalWorkHours      Float    @default(0)
+  totalOvertimeHours  Float    @default(0)
+  totalLateDays       Int      @default(0)
+  totalAbsentDays     Int      @default(0)
+  totalEarlyLeaveDays Int      @default(0)
+  totalLaborCost      Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([tenantId, employeeId, yearMonth])
+  @@index([tenantId, yearMonth])
+  @@map("monthly_attendance_summaries")
+}
+
+// 休暇申請
+model LeaveRequest {
+  id         String      @id @default(uuid())
+  tenantId   String
+  employeeId String
+  leaveType  LeaveType
+  startDate  DateTime    @db.Date
+  endDate    DateTime    @db.Date
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  approvedBy String?
+  approvedAt DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@index([tenantId, employeeId])
+  @@index([tenantId, status])
+  @@map("leave_requests")
+}
+
+enum LeaveType {
+  PAID_LEAVE    // 有給休暇
+  SICK_LEAVE    // 病欠
+  SPECIAL_LEAVE // 特別休暇
+  ABSENCE       // 欠勤
+}
+
+enum LeaveStatus {
+  PENDING   // 申請中
+  APPROVED  // 承認
+  REJECTED  // 却下
+}
+
+// =============================================================
+// 会社カレンダー（指定休日・特別営業日）
+// =============================================================
+model CompanyCalendar {
+  id          String            @id @default(uuid())
+  tenantId    String
+  storeId     String?           // NULLなら全店舗共通
+  calendarDate DateTime         @db.Date
+  dayType     CalendarDayType
+  name        String?           // "元旦", "棚卸日" など
+  note        String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  store  Store? @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, storeId, calendarDate])
+  @@index([tenantId, calendarDate])
+  @@map("company_calendars")
+}
+
+enum CalendarDayType {
+  HOLIDAY         // 休業日（元旦など）
+  SPECIAL_OPEN    // 特別営業日（初売りなど）
+  REDUCED_HOURS   // 短縮営業
+  INVENTORY       // 棚卸日（早閉め or 人員増）
+  BUSY_DAY        // 繁忙日（年末・お盆前など）
+}
+
+// =============================================================
+// 就業規則マスタ（雇用区分別の労働条件・制約）
+// =============================================================
+model EmploymentRule {
+  id                  String         @id @default(uuid())
+  tenantId            String
+  employmentType      EmploymentType
+  name                String         // "正社員就業規則", "パートタイマー規則"
+  monthlyWorkDays     Int?           // 月間所定労働日数（正社員: 20-22日）
+  weeklyWorkDays      Int?           // 週間所定労働日数
+  dailyWorkHours      Float?         // 1日の所定労働時間（8.0h）
+  weeklyMaxHours      Float?         // 週最大労働時間（40h）
+  monthlyMaxHours     Float?         // 月最大労働時間
+  maxConsecutiveDays  Int?           // 連続勤務日数上限（6日）
+  minBreakMinutes     Int            @default(60) // 6h超で60分休憩
+  overtimeThresholdDaily   Float?    // 日残業閾値（8h）
+  overtimeThresholdWeekly  Float?    // 週残業閾値（40h）
+  nightShiftStartTime String?        // 深夜割増開始（"22:00"）
+  nightShiftEndTime   String?        // 深夜割増終了（"05:00"）
+  nightShiftPremium   Float?         // 深夜割増率（0.25 = 25%）
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, employmentType])
+  @@index([tenantId])
+  @@map("employment_rules")
+}
+
+// =============================================================
+// 出勤パターンプロファイル（実績ベースの自動学習結果）
+// =============================================================
+model AttendanceProfile {
+  id                String   @id @default(uuid())
+  tenantId          String
+  employeeId        String   @unique
+  storeId           String
+  analyzedFrom      DateTime @db.Date  // 分析対象期間開始
+  analyzedTo        DateTime @db.Date  // 分析対象期間終了
+  totalRecordDays   Int      @default(0)  // 分析対象の総レコード数
+
+  // 曜日別出勤確率（0.0-1.0）: JSON配列 [日,月,火,水,木,金,土]
+  dayOfWeekProb     Float[]  // 長さ7の配列
+
+  // 平均出勤時刻（分単位: 9:05 → 545）
+  avgClockInMinute  Float?
+  stdClockInMinute  Float?   // 標準偏差
+
+  // 平均退勤時刻
+  avgClockOutMinute Float?
+  stdClockOutMinute Float?
+
+  // 月間実績
+  avgMonthlyDays    Float?   // 月平均出勤日数
+  avgDailyHours     Float?   // 日平均労働時間
+
+  // よく入る時間帯パターン（最頻値）
+  typicalStartTime  String?  // "09:00"
+  typicalEndTime    String?  // "14:00"
+  typicalBreakMin   Int?
+
+  // ===== v4拡張フィールド =====
+
+  // 時間帯別出勤確率 [09-12, 12-15, 15-18, 18-22] 長さ4
+  timeSlotProb      Float[]  @default([])
+
+  // 曜日×時間帯マトリクス: 長さ28 [日09-12, 日12-15, ..., 土18-22]
+  // index = dayOfWeek * 4 + slotIndex
+  dowTimeSlotProb   Float[]  @default([])
+
+  // よく入るシフトパターン名 (例: ["morning","afternoon"])
+  preferredPatterns String[] @default([])
+
+  // 平均連勤日数
+  avgConsecutiveDays Float?
+
+  // 典型的な週間労働時間
+  typicalWeeklyHours Float?
+
+  // シフト遵守率（割当シフトに対して出勤した率 0.0-1.0）
+  scheduleAdherence  Float?
+
+  // ===== 既存フィールド =====
+
+  // 信頼度スコア（データ量に基づく 0.0-1.0）
+  confidenceScore   Float    @default(0)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, employeeId])
+  @@index([tenantId, storeId])
+  @@map("attendance_profiles")
+}
+
+// =============================================================
+// 部門別必須スキル定義
+// =============================================================
+model DepartmentSkillRequirement {
+  id            String   @id @default(uuid())
+  tenantId      String
+  departmentId  String
+  skillName     String   // "包丁技術", "刺身盛付", "レジ操作" etc.
+  isRequired    Boolean  @default(true)  // true=必須, false=あれば望ましい
+  description   String?  // 説明
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@unique([tenantId, departmentId, skillName])
+  @@index([tenantId, departmentId])
+  @@map("department_skill_requirements")
+}
+
+// =============================================================
+// 本部応援（外部からの応援要員）
+// =============================================================
+model HeadquartersSupport {
+  id            String   @id @default(uuid())
+  tenantId      String
+  storeId       String   // 応援先店舗
+  departmentId  String?  // 応援先部門
+  supportDate   DateTime @db.Date
+  staffName     String   // 応援者名（本部社員名）
+  staffCode     String?  // 社員番号（あれば）
+  startTime     String   // "09:00"
+  endTime       String   // "17:00"
+  breakMinutes  Int      @default(60)
+  skills        String[] // 保有スキル
+  note          String?  // 備考（"棚卸応援", "繁忙期応援" 等）
+  status        HQSupportStatus @default(REQUESTED)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  store  Store   @relation(fields: [storeId], references: [id])
+
+  @@index([tenantId, storeId, supportDate])
+  @@map("headquarters_supports")
+}
+
+enum HQSupportStatus {
+  REQUESTED   // 要請中
+  CONFIRMED   // 確定
+  CANCELLED   // キャンセル
+}
