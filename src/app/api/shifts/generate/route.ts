@@ -1,15 +1,20 @@
 // =============================================================
 // シフト自動生成 API
 // POST /api/shifts/generate
+// STORE_MANAGER以上のみ、店舗スコープ付き
 // =============================================================
 import { NextRequest } from "next/server";
 import { getTenantDb } from "@/lib/tenant";
+import { requireRole } from "@/lib/auth-utils";
 import { shiftGenerateSchema } from "@/lib/validations/shift";
 import { generateShifts } from "@/lib/shift-generator";
 import { apiSuccess, apiError, apiValidationError } from "@/lib/api-response";
 
 export async function POST(request: NextRequest) {
   try {
+    const roleCheck = await requireRole("STORE_MANAGER");
+    if (roleCheck.error) return roleCheck.error;
+
     const { db } = await getTenantDb();
     const body = await request.json();
     const parsed = shiftGenerateSchema.safeParse(body);

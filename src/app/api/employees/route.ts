@@ -1,17 +1,25 @@
 // =============================================================
 // 従業員 API（シフト管理画面で使用する一覧取得）
 // GET /api/employees - 従業員一覧
+// 店舗ユーザーは自店舗の従業員のみ
 // =============================================================
 import { NextRequest } from "next/server";
 import { getTenantDb } from "@/lib/tenant";
+import { requireAuth } from "@/lib/auth-utils";
 import { apiSuccess, apiError, apiPaginated } from "@/lib/api-response";
 
 export async function GET(request: NextRequest) {
   try {
-    const { db } = await getTenantDb();
     const url = new URL(request.url);
+    const requestedStoreId = url.searchParams.get("storeId");
 
-    const storeId = url.searchParams.get("storeId");
+    const auth = await requireAuth(requestedStoreId);
+    if (auth.error) return auth.error;
+
+    const { db } = await getTenantDb();
+
+    // 店舗ユーザーは自店舗に固定
+    const storeId = auth.effectiveStoreId || url.searchParams.get("storeId");
     const departmentId = url.searchParams.get("departmentId");
     const search = url.searchParams.get("search");
     const activeOnly = url.searchParams.get("activeOnly") !== "false";

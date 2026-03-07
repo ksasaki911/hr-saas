@@ -5,6 +5,7 @@
 // =============================================================
 import { NextRequest } from "next/server";
 import { getTenantDb } from "@/lib/tenant";
+import { requireAuth } from "@/lib/auth-utils";
 import { apiSuccess, apiError } from "@/lib/api-response";
 
 const TIME_SLOTS = ["09:00-12:00", "12:00-15:00", "15:00-18:00", "18:00-22:00"];
@@ -32,6 +33,11 @@ function localDateStr(d: Date): string {
 
 export async function GET(request: NextRequest) {
   try {
+    const url = new URL(request.url);
+    const requestedStoreId = url.searchParams.get("storeId");
+    const auth = await requireAuth(requestedStoreId);
+    if (auth.error) return auth.error;
+
     const { db } = await getTenantDb();
     const weekStartStr = request.nextUrl.searchParams.get("weekStart");
     const storeId = request.nextUrl.searchParams.get("storeId") || undefined;

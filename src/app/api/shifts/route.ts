@@ -2,9 +2,11 @@
 // シフト CRUD API
 // GET  /api/shifts - シフト一覧取得
 // POST /api/shifts - シフト作成
+// 店舗ユーザーは自店舗のみ、本部は全店舗アクセス可
 // =============================================================
 import { NextRequest } from "next/server";
 import { getTenantDb } from "@/lib/tenant";
+import { requireAuth, requireRole } from "@/lib/auth-utils";
 import { shiftCreateSchema, shiftQuerySchema } from "@/lib/validations/shift";
 import {
   apiSuccess,
@@ -16,12 +18,17 @@ import {
 // シフト一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const { db } = await getTenantDb();
     const url = new URL(request.url);
+    const requestedStoreId = url.searchParams.get("storeId") || undefined;
 
-    // クエリパラメータ取得
+    const auth = await requireAuth(requestedStoreId);
+    if (auth.error) return auth.error;
+
+    const { db } = await getTenantDb();
+
+    // クエリパラメータ取得（storeIdは権限チェック済みの値を使用）
     const params = {
-      storeId: url.searchParams.get("storeId") || undefined,
+      storeId: auth.effectiveStoreId || undefined,
       startDate: url.searchParams.get("startDate") || "",
       endDate: url.searchParams.get("endDate") || "",
       departmentId: url.searchParams.get("departmentId") || undefined,
@@ -83,9 +90,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// シフト作成
+// シフト作成（STORE_MANAGER以上のみ）
 export async function POST(request: NextRequest) {
   try {
+    const roleCheck = await requireRole("STORE_MANAGER");
+    if (roleCheck.error) return roleCheck.error;
+
     const { db } = await getTenantDb();
     const body = await request.json();
 
