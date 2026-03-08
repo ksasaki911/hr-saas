@@ -49,9 +49,18 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: "レポート",
+    minRole: "STORE_MANAGER",
+    items: [
+      { href: "/labor-analysis", label: "人件費分析", icon: "💰" },
+      { href: "/sales-input", label: "売上入力", icon: "💹" },
+    ],
+  },
+  {
     title: "データ連携",
     minRole: "STORE_MANAGER",
     items: [
+      { href: "/payroll-import", label: "給与奉行連携", icon: "🔗", minRole: "STORE_MANAGER" },
       { href: "/import", label: "CSVインポート", icon: "📥" },
     ],
   },

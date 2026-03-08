@@ -43,6 +43,9 @@ model Tenant {
   attendanceProfiles AttendanceProfile[]
   departmentSkillRequirements DepartmentSkillRequirement[]
   headquartersSupports HeadquartersSupport[]
+  dailySales           DailySales[]
+  laborBudgets         LaborBudget[]
+  payrollRecords       PayrollRecord[]
 
   @@map("tenants")
 }
@@ -106,6 +109,9 @@ model Store {
   companyCalendars CompanyCalendar[]
   attendanceProfiles AttendanceProfile[]
   headquartersSupports HeadquartersSupport[]
+  dailySales           DailySales[]
+  laborBudgets         LaborBudget[]
+  payrollRecords       PayrollRecord[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -127,6 +133,8 @@ model Department {
   shifts    Shift[]
   staffingRequirements StaffingRequirement[]
   skillRequirements DepartmentSkillRequirement[]
+  dailySales        DailySales[]
+  laborBudgets      LaborBudget[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -189,6 +197,7 @@ model Employee {
   monthlyAttendanceSummaries MonthlyAttendanceSummary[]
   leaveRequests LeaveRequest[]
   attendanceProfile AttendanceProfile?
+  payrollRecords    PayrollRecord[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -637,4 +646,89 @@ enum HQSupportStatus {
   REQUESTED   // 要請中
   CONFIRMED   // 確定
   CANCELLED   // キャンセル
+}
+
+// =============================================================
+// 日別売上データ（人件費分析・MH生産性の計算用）
+// =============================================================
+model DailySales {
+  id           String   @id @default(uuid())
+  tenantId     String
+  storeId      String
+  departmentId String?  // 部門別売上（null = 店舗全体）
+  salesDate    DateTime // 売上日
+  salesAmount  Float    // 売上金額
+  grossProfit  Float?   // 荒利高（粗利益）
+  customerCount Int?    // 客数
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  store      Store       @relation(fields: [storeId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@unique([tenantId, storeId, departmentId, salesDate])
+  @@index([tenantId, storeId, salesDate])
+  @@map("daily_sales")
+}
+
+// =============================================================
+// 人件費予算（月次）
+// =============================================================
+model LaborBudget {
+  id           String   @id @default(uuid())
+  tenantId     String
+  storeId      String
+  departmentId String?
+  yearMonth    String   // "2026-03" 形式
+  budgetAmount Float    // 予算人件費（円）
+  budgetHours  Float?   // 予算工数（時間）
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  store      Store       @relation(fields: [storeId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@unique([tenantId, storeId, departmentId, yearMonth])
+  @@index([tenantId, storeId, yearMonth])
+  @@map("labor_budgets")
+}
+
+// =============================================================
+// 給与実績（給与奉行連携用）
+// =============================================================
+model PayrollRecord {
+  id                String   @id @default(uuid())
+  tenantId          String
+  employeeId        String
+  storeId           String
+  yearMonth         String   // "2026-03" 形式
+  baseSalary        Int      // 基本給
+  overtimePay       Int      @default(0) // 残業手当
+  nightPay          Int      @default(0) // 深夜手当
+  holidayPay        Int      @default(0) // 休日手当
+  commutingAllowance Int     @default(0) // 通勤手当
+  otherAllowance    Int      @default(0) // その他手当
+  totalPayment      Int      // 支給総額
+  socialInsurance   Int      @default(0) // 社会保険料（会社負担分）
+  laborInsurance    Int      @default(0) // 労働保険料（会社負担分）
+  totalLaborCost    Int      // 総人件費（支給総額 + 法定福利費）
+  workDays          Float?   // 勤務日数
+  workHours         Float?   // 勤務時間
+  overtimeHours     Float?   // 残業時間
+  paidLeaveDays     Float?   // 有給取得日数
+  note              String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  store    Store    @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, employeeId, yearMonth])
+  @@index([tenantId, storeId, yearMonth])
+  @@map("payroll_records")
 }

@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- 認証不要パス ---
-  const publicPaths = ["/login", "/api/auth"];
+  const publicPaths = ["/login", "/api/auth", "/api/admin/setup-users"];
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
   if (isPublic) {

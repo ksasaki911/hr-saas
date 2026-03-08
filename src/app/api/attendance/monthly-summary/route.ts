@@ -85,7 +85,13 @@ export async function GET(request: NextRequest) {
       if (r.lateMinutes > 0) summary.totalLateDays++;
       if (r.status === "ABSENT") summary.totalAbsentDays++;
       if (r.earlyLeaveMinutes > 0) summary.totalEarlyLeaveDays++;
-      summary.totalLaborCost += r.laborCost || 0;
+
+      // laborCostがnullの場合、hourlyWageから補完計算
+      let cost = r.laborCost;
+      if (cost === null && r.totalWorkMinutes > 0 && emp.hourlyWage) {
+        cost = Math.round((emp.hourlyWage * r.totalWorkMinutes) / 60);
+      }
+      summary.totalLaborCost += cost || 0;
     }
 
     // 数値の丸め
