@@ -85,6 +85,19 @@ export default function StoreDashboardPage() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
+
+  // 年月ドロップダウン用の選択肢を生成（過去24ヶ月〜当月）
+  const monthOptions = useMemo(() => {
+    const opts: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i <= 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+      opts.push({ value: val, label });
+    }
+    return opts;
+  }, []);
   const [data, setData] = useState<StoreData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -329,12 +342,15 @@ export default function StoreDashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <input
-            type="month"
+          <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="border rounded-lg px-3 py-2 text-sm"
-          />
+          >
+            {monthOptions.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
           <select
             value={selectedStoreId}
             onChange={(e) => setSelectedStoreId(e.target.value)}

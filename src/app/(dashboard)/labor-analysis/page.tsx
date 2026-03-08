@@ -43,6 +43,17 @@ type StoreResult = {
   dailyTrend: DailyTrend[];
 };
 
+type MonthlyTrend = {
+  yearMonth: string;
+  laborCost: number;
+  workHours: number;
+  sales: number;
+  grossProfit: number;
+  customers: number;
+  laborCostRatio: number | null;
+  mhProductivity: number | null;
+};
+
 type AnalysisData = {
   period: { start: string; end: string; yearMonth: string };
   totals: {
@@ -58,6 +69,7 @@ type AnalysisData = {
     budgetVariance: number | null;
   };
   stores: StoreResult[];
+  monthlyTrend: MonthlyTrend[];
 };
 
 // 月選択用：過去18ヶ月分のオプション生成
@@ -120,19 +132,25 @@ function KpiCard({
 }
 
 // ============================================================
-// 日別推移チャート（Canvas描画）
+// 月別推移チャート（Canvas描画）
 // ============================================================
-function DailyTrendChart({
+function MonthlyTrendChart({
   data,
   metric,
 }: {
-  data: DailyTrend[];
-  metric: "laborCost" | "mhProductivity" | "laborCostRatio" | "sales";
+  data: MonthlyTrend[];
+  metric: "laborCost" | "mhProductivity" | "laborCostRatio" | "sales" | "grossProfit";
 }) {
   const canvasId = `chart-${metric}`;
 
   useEffect(() => {
-    if (data.length === 0) return;
+    // データがあるもの（値が0でないもの）だけ表示
+    const hasData = data.some((d) => {
+      const v = d[metric];
+      return v !== null && v !== undefined && v !== 0;
+    });
+    if (!hasData) return;
+
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -150,16 +168,14 @@ function DailyTrendChart({
     const chartW = W - pad.left - pad.right;
     const chartH = H - pad.top - pad.bottom;
 
-    // データ抽出
     const values = data.map((d) => {
       const v = d[metric];
       return v !== null && v !== undefined ? v : 0;
     });
     const maxVal = Math.max(...values, 1);
-    const minVal = Math.min(...values, 0);
+    const minVal = Math.min(...values.filter(v => v > 0), 0);
     const range = maxVal - minVal || 1;
 
-    // 背景
     ctx.clearRect(0, 0, W, H);
 
     // グリッド線
@@ -172,47 +188,49 @@ function DailyTrendChart({
       ctx.lineTo(W - pad.right, y);
       ctx.stroke();
 
-      // ラベル
       ctx.fillStyle = "#9ca3af";
       ctx.font = "11px sans-serif";
       ctx.textAlign = "right";
       const label = maxVal - (range / 4) * i;
       if (metric === "laborCostRatio") {
         ctx.fillText(`${label.toFixed(1)}%`, pad.left - 8, y + 4);
-      } else if (metric === "laborCost" || metric === "sales") {
+      } else if (metric === "laborCost" || metric === "sales" || metric === "grossProfit") {
         ctx.fillText(`${Math.round(label / 10000)}万`, pad.left - 8, y + 4);
       } else {
         ctx.fillText(`${Math.round(label).toLocaleString()}`, pad.left - 8, y + 4);
       }
     }
 
-    // X軸ラベル
+    // X軸ラベル（月）
     ctx.textAlign = "center";
     ctx.fillStyle = "#9ca3af";
     ctx.font = "10px sans-serif";
-    const step = Math.max(1, Math.floor(data.length / 10));
     data.forEach((d, i) => {
-      if (i % step === 0 || i === data.length - 1) {
-        const x = pad.left + (chartW / (data.length - 1 || 1)) * i;
-        const dateLabel = d.date.slice(5); // MM-DD
-        ctx.fillText(dateLabel, x, H - pad.bottom + 20);
-      }
+      const x = pad.left + (chartW / (data.length - 1 || 1)) * i;
+      const parts = d.yearMonth.split("-");
+      const monthLabel = `${parts[1]}月`;
+      // 1月は年も表示
+      const label = parts[1] === "01" ? `${parts[0]}/${parts[1]}` : monthLabel;
+      ctx.fillText(label, x, H - pad.bottom + 20);
     });
 
-    // 折れ線
+    // データがある月だけ線を引く（0の月はスキップ）
     const colors: Record<string, string> = {
       laborCost: "#ef4444",
       mhProductivity: "#3b82f6",
       laborCostRatio: "#f59e0b",
       sales: "#10b981",
+      grossProfit: "#8b5cf6",
     };
     ctx.strokeStyle = colors[metric] || "#3b82f6";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
+    let started = false;
     values.forEach((v, i) => {
+      if (v === 0 && metric !== "laborCostRatio") return;
       const x = pad.left + (chartW / (data.length - 1 || 1)) * i;
       const y = pad.top + chartH - ((v - minVal) / range) * chartH;
-      if (i === 0) ctx.moveTo(x, y);
+      if (!started) { ctx.moveTo(x, y); started = true; }
       else ctx.lineTo(x, y);
     });
     ctx.stroke();
@@ -220,25 +238,32 @@ function DailyTrendChart({
     // ドット
     ctx.fillStyle = colors[metric] || "#3b82f6";
     values.forEach((v, i) => {
+      if (v === 0 && metric !== "laborCostRatio") return;
       const x = pad.left + (chartW / (data.length - 1 || 1)) * i;
       const y = pad.top + chartH - ((v - minVal) / range) * chartH;
       ctx.beginPath();
-      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
     });
   }, [data, metric, canvasId]);
 
   const titles: Record<string, string> = {
-    laborCost: "人件費推移",
-    mhProductivity: "MH生産性推移",
-    laborCostRatio: "人件費率推移",
-    sales: "売上推移",
+    laborCost: "人件費推移（月別）",
+    mhProductivity: "MH生産性推移（月別）",
+    laborCostRatio: "人件費率推移（月別）",
+    sales: "売上推移（月別）",
+    grossProfit: "荒利推移（月別）",
   };
+
+  const hasData = data.some((d) => {
+    const v = d[metric];
+    return v !== null && v !== undefined && v !== 0;
+  });
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">{titles[metric]}</h3>
-      {data.length > 0 ? (
+      {hasData ? (
         <canvas id={canvasId} className="w-full" style={{ height: 200 }} />
       ) : (
         <div className="h-[200px] flex items-center justify-center text-gray-400 text-sm">
@@ -355,12 +380,8 @@ export default function LaborAnalysisPage() {
     fetchData();
   }, [fetchData]);
 
-  // 日別推移データ（選択店舗 or 全店合計）
-  const trendData: DailyTrend[] = selectedStore
-    ? selectedStore.dailyTrend
-    : data?.stores.length === 1
-    ? data.stores[0].dailyTrend
-    : [];
+  // 月別推移データ
+  const monthlyTrendData: MonthlyTrend[] = data?.monthlyTrend || [];
 
   const totals = data?.totals;
 
@@ -534,12 +555,13 @@ export default function LaborAnalysisPage() {
             </div>
           )}
 
-          {/* 日別推移チャート + 雇用形態別内訳 */}
+          {/* 月別推移チャート */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <DailyTrendChart data={trendData} metric="laborCost" />
-            <DailyTrendChart data={trendData} metric="sales" />
-            <DailyTrendChart data={trendData} metric="mhProductivity" />
-            <DailyTrendChart data={trendData} metric="laborCostRatio" />
+            <MonthlyTrendChart data={monthlyTrendData} metric="laborCost" />
+            <MonthlyTrendChart data={monthlyTrendData} metric="sales" />
+            <MonthlyTrendChart data={monthlyTrendData} metric="grossProfit" />
+            <MonthlyTrendChart data={monthlyTrendData} metric="mhProductivity" />
+            <MonthlyTrendChart data={monthlyTrendData} metric="laborCostRatio" />
           </div>
 
           {/* 雇用形態別内訳 */}

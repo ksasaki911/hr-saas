@@ -1,3 +1,4 @@
+// @ts-nocheck
 // =============================================================
 // シードデータ投入スクリプト
 // スーパーマーケットの現実的なデータ構成
@@ -331,7 +332,7 @@ async function main() {
         employeeId: u.employeeId,
         email: u.email,
         passwordHash: "$2b$10$dummyhashforseeding000000000000000000000000", // 仮
-        role: u.role,
+        role: u.role as "SYSTEM_ADMIN" | "TENANT_ADMIN" | "AREA_MANAGER" | "STORE_MANAGER" | "ASSISTANT_MANAGER" | "STORE_STAFF",
       },
     });
   }

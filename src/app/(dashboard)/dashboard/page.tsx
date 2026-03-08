@@ -352,6 +352,41 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* テーブル: 店舗別従業員構成 */}
+      {data.storeEmpBreakdown.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border p-5">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">店舗別 従業員構成（テーブル）</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 text-left">
+                  <th className="px-3 py-2 font-medium text-gray-600">店舗</th>
+                  <th className="px-3 py-2 font-medium text-gray-600 text-right">正社員</th>
+                  <th className="px-3 py-2 font-medium text-gray-600 text-right">パート</th>
+                  <th className="px-3 py-2 font-medium text-gray-600 text-right">アルバイト</th>
+                  <th className="px-3 py-2 font-medium text-gray-600 text-right">契約</th>
+                  <th className="px-3 py-2 font-medium text-gray-600 text-right">合計</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.storeEmpBreakdown
+                  .sort((a, b) => b.total - a.total)
+                  .map((s, i) => (
+                    <tr key={s.storeId} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                      <td className="px-3 py-2 font-medium">{s.storeName}</td>
+                      <td className="px-3 py-2 text-right">{s.fullTime}</td>
+                      <td className="px-3 py-2 text-right">{s.partTime}</td>
+                      <td className="px-3 py-2 text-right">{s.arbeit}</td>
+                      <td className="px-3 py-2 text-right">{s.contract}</td>
+                      <td className="px-3 py-2 text-right font-medium">{s.total}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* チャート: 店舗別人件費推移 */}
       <div className="bg-white rounded-xl shadow-sm border p-5">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">店舗別 月次人件費推移（上位10店舗）</h2>

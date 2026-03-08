@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 
 // ============================================================
 // 給与奉行連携 画面
@@ -222,6 +222,19 @@ function PayrollImportPanel() {
     const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`;
   });
+
+  // 年月ドロップダウン用の選択肢（過去24ヶ月〜当月）
+  const monthOptions = useMemo(() => {
+    const opts: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i <= 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+      opts.push({ value: val, label });
+    }
+    return opts;
+  }, []);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"upload" | "ready" | "done">("upload");
@@ -291,12 +304,15 @@ function PayrollImportPanel() {
         <>
           <div className="flex items-center gap-3">
             <label className="text-sm text-gray-600">対象年月：</label>
-            <input
-              type="month"
+            <select
               value={yearMonth}
               onChange={(e) => setYearMonth(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            >
+              {monthOptions.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
           <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
             <input

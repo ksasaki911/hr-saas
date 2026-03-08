@@ -1,4 +1,5 @@
 // ダッシュボード用データ集計API
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getTenantDb } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 
@@ -133,28 +134,29 @@ export async function GET() {
     }));
 
     // 店舗別従業員構成
-    const storeEmpBreakdown = stores.map(s => {
-      const storeEmps = employees.filter(e => e.storeId === s.id && e.isActive);
+    type EmpRow = { storeId: string; isActive: boolean; employmentType: string; id: string; hourlyWage: number | null };
+    const storeEmpBreakdown = stores.map((s: { id: string; name: string; code: string }) => {
+      const storeEmps = (employees as EmpRow[]).filter((e) => e.storeId === s.id && e.isActive);
       return {
         storeId: s.id,
         storeName: s.name,
-        fullTime: storeEmps.filter(e => e.employmentType === "FULL_TIME").length,
-        partTime: storeEmps.filter(e => e.employmentType === "PART_TIME").length,
-        arbeit: storeEmps.filter(e => e.employmentType === "ARBEIT").length,
-        contract: storeEmps.filter(e => e.employmentType === "CONTRACT").length,
+        fullTime: storeEmps.filter((e) => e.employmentType === "FULL_TIME").length,
+        partTime: storeEmps.filter((e) => e.employmentType === "PART_TIME").length,
+        arbeit: storeEmps.filter((e) => e.employmentType === "ARBEIT").length,
+        contract: storeEmps.filter((e) => e.employmentType === "CONTRACT").length,
         total: storeEmps.length,
       };
-    }).filter(s => s.total > 0);
+    }).filter((s: any) => s.total > 0);
 
     return NextResponse.json({
-      stores: stores.map(s => ({ id: s.id, name: s.name, code: s.code })),
+      stores: stores.map((s: any) => ({ id: s.id, name: s.name, code: s.code })),
       summary: {
-        totalEmployees: employees.filter(e => e.isActive).length,
+        totalEmployees: (employees as any[]).filter((e: any) => e.isActive).length,
         totalStores: stores.length,
         totalRecords: records.length,
         dateRange: {
-          from: records.length > 0 ? records.reduce((min, r) => r.attendanceDate < min ? r.attendanceDate : min, records[0].attendanceDate) : null,
-          to: records.length > 0 ? records.reduce((max, r) => r.attendanceDate > max ? r.attendanceDate : max, records[0].attendanceDate) : null,
+          from: records.length > 0 ? records.reduce((min: any, r: any) => r.attendanceDate < min ? r.attendanceDate : min, records[0].attendanceDate) : null,
+          to: records.length > 0 ? records.reduce((max: any, r: any) => r.attendanceDate > max ? r.attendanceDate : max, records[0].attendanceDate) : null,
         },
       },
       monthly,

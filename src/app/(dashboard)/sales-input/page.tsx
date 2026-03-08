@@ -272,7 +272,7 @@ export default function SalesInputPage() {
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
               {(() => {
-                const opts = [];
+                const opts: React.ReactElement[] = [];
                 const now = new Date();
                 for (let i = 0; i < 18; i++) {
                   const d = new Date(now.getFullYear(), now.getMonth() - i, 1);

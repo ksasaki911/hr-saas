@@ -310,6 +310,102 @@ export async function GET(request: NextRequest) {
       ? totals.totalBudget - totals.totalLaborCost
       : null;
 
+    // --- 月別推移データ（過去12ヶ月） ---
+    const monthlyTrend: Array<{
+      yearMonth: string;
+      laborCost: number;
+      workHours: number;
+      sales: number;
+      grossProfit: number;
+      customers: number;
+      laborCostRatio: number | null;
+      mhProductivity: number | null;
+    }> = [];
+
+    {
+      // 基準月から過去12ヶ月を取得
+      const [baseY, baseM] = budgetYearMonth.split("-").map(Number);
+      const monthStart = new Date(baseY, baseM - 12, 1); // 12ヶ月前の1日
+      const monthEnd = new Date(baseY, baseM, 0, 23, 59, 59); // 基準月の末日
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const trendAttWhere: any = {
+        tenantId,
+        attendanceDate: { gte: monthStart, lte: monthEnd },
+        totalWorkMinutes: { gt: 0 },
+      };
+      if (requestedStoreId) trendAttWhere.storeId = requestedStoreId;
+
+      const trendRecords = await db.attendanceRecord.findMany({
+        where: trendAttWhere,
+        select: {
+          attendanceDate: true,
+          totalWorkMinutes: true,
+          laborCost: true,
+          employee: { select: { hourlyWage: true } },
+        },
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const trendSalesWhere: any = {
+        tenantId,
+        salesDate: { gte: monthStart, lte: monthEnd },
+      };
+      if (requestedStoreId) trendSalesWhere.storeId = requestedStoreId;
+
+      const trendSales = await db.dailySales.findMany({
+        where: trendSalesWhere,
+      });
+
+      // 月別に集計
+      const monthMap = new Map<string, { laborCost: number; workMinutes: number; sales: number; grossProfit: number; customers: number }>();
+
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(baseY, baseM - 1 - i, 1);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        monthMap.set(ym, { laborCost: 0, workMinutes: 0, sales: 0, grossProfit: 0, customers: 0 });
+      }
+
+      for (const r of trendRecords) {
+        const d = new Date(r.attendanceDate);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const m = monthMap.get(ym);
+        if (m) {
+          let cost = r.laborCost || 0;
+          if (cost === 0 && r.totalWorkMinutes > 0 && r.employee?.hourlyWage) {
+            cost = Math.round((r.employee.hourlyWage * r.totalWorkMinutes) / 60);
+          }
+          m.laborCost += cost;
+          m.workMinutes += r.totalWorkMinutes;
+        }
+      }
+
+      for (const sale of trendSales) {
+        const d = new Date(sale.salesDate);
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const m = monthMap.get(ym);
+        if (m) {
+          m.sales += sale.salesAmount;
+          m.grossProfit += sale.grossProfit || 0;
+          m.customers += sale.customerCount || 0;
+        }
+      }
+
+      for (const [ym, m] of monthMap) {
+        const workHours = Math.round(m.workMinutes / 60 * 10) / 10;
+        monthlyTrend.push({
+          yearMonth: ym,
+          laborCost: m.laborCost,
+          workHours,
+          sales: m.sales,
+          grossProfit: m.grossProfit,
+          customers: m.customers,
+          laborCostRatio: m.sales > 0 ? Math.round((m.laborCost / m.sales) * 1000) / 10 : null,
+          mhProductivity: workHours > 0 ? Math.round(m.sales / workHours) : null,
+        });
+      }
+    }
+
     return apiSuccess({
       period: {
         start: periodStart.toISOString().split("T")[0],
@@ -318,6 +414,7 @@ export async function GET(request: NextRequest) {
       },
       totals,
       stores: storeResults,
+      monthlyTrend,
     });
   } catch (error) {
     console.error("GET /api/labor-analysis error:", error);

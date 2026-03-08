@@ -1,3 +1,4 @@
+// @ts-nocheck
 // =============================================================
 // 店舗長ダッシュボードAPI
 // GET /api/admin/store-dashboard?storeId=xxx

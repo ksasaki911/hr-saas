@@ -3,7 +3,7 @@
 // =============================================================
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 interface Employee {
   id: string;
@@ -72,7 +72,20 @@ export default function ShiftRequestsPage() {
   const [yearMonth, setYearMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  
+  });
+  // 年月ドロップダウン用の選択肢（過去12ヶ月〜6ヶ月先）
+  const monthOptions = useMemo(() => {
+    const opts: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = -6; i <= 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+      opts.push({ value: val, label });
+    }
+    return opts;
+  }, []);
+
   // 店舗ID動的取得
   useEffect(() => {
     fetch("/api/stores")
@@ -85,7 +98,6 @@ export default function ShiftRequestsPage() {
       })
       .catch(() => {});
   }, []);
-  });
 
   // 従業員取得
   useEffect(() => {
@@ -307,12 +319,15 @@ export default function ShiftRequestsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">展開対象月</label>
-              <input
-                type="month"
+              <select
                 value={yearMonth}
                 onChange={(e) => setYearMonth(e.target.value)}
                 className="border rounded-lg px-3 py-2 text-sm"
-              />
+              >
+                {monthOptions.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
             </div>
             <button
               onClick={handleExpand}
