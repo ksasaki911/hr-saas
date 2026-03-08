@@ -62,7 +62,7 @@ export const EMPLOYEE_MAPPING_PRESETS = [
   { systemField: "storeCode", patterns: ["拠点コード", "所属コード", "店舗コード", "勤務地コード"] },
   { systemField: "departmentName", patterns: ["部門", "部門名", "部署", "部署名", "セクション"] },
   { systemField: "departmentCode", patterns: ["部門コード", "部署コード"] },
-  { systemField: "employmentType", patterns: ["雇用区分コード", "雇用区分", "雇用形態", "勤務形態", "従業員区分", "区分"] },
+  { systemField: "employmentType", patterns: ["雇用区分コード", "雇用区分", "給与体系コード", "給与体系", "パート区分コード", "パート区分", "雇用形態", "勤務形態", "従業員区分", "区分"] },
   { systemField: "positionName", patterns: ["役職", "職位", "ポジション", "職種"] },
   { systemField: "hireDate", patterns: ["入社日", "入社年月日", "雇用開始日", "採用日"] },
   { systemField: "hourlyWage", patterns: ["時給", "時間単価", "時給単価"] },
@@ -118,6 +118,7 @@ export const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
  * ※マルエーうちや様の設定に基づく
  */
 export const EMPLOYMENT_CODE_MAP: Record<string, string> = {
+  // タッチオンタイム雇用区分コード（1桁）
   "1": "FULL_TIME",    // 社員（一般）
   "2": "FULL_TIME",    // 社員（一般管理職）
   "3": "FULL_TIME",    // 社員（管理職）
@@ -129,6 +130,14 @@ export const EMPLOYMENT_CODE_MAP: Record<string, string> = {
   "11": "ARBEIT",      // アルバイト（時間帯なし）
   "15": "PART_TIME",   // 鮮魚ＰＣ技術手当用
   "016": "FULL_TIME",  // 会長
+  // 給与奉行 給与体系コード（4桁）
+  "0001": "FULL_TIME", // 社員（一般）
+  "0002": "FULL_TIME", // 社員（一般管理職）
+  "0003": "FULL_TIME", // 社員（管理職）
+  "0004": "PART_TIME", // パート
+  "0006": "PART_TIME", // パート（時間帯なし）
+  "0007": "PART_TIME", // パート（月給：特殊）
+  "0011": "ARBEIT",    // アルバイト（時間帯なし）
 };
 
 /**
