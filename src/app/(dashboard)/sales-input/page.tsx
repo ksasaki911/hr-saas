@@ -525,32 +525,39 @@ export default function SalesInputPage() {
                 if (f) {
                   setExcelFile(f);
                   setExcelPreview([]);
+                  setMessage({ type: "success", text: `ファイル「${f.name}」を読み込み中...` });
                   // クライアント側プレビュー: FormDataでサーバに送る前にSheetJSで表示
                   const reader = new FileReader();
                   reader.onload = (ev) => {
-                    try {
-                      // dynamic import不要: xlsx はビルド時にバンドルされる
-                      import("xlsx").then((XLSX) => {
-                        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
-                        const wb = XLSX.read(data, { type: "array" });
-                        const sheetName = wb.SheetNames.find((n: string) => n.includes("店別月別")) || wb.SheetNames[0];
-                        const sheet = wb.Sheets[sheetName];
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const rows = XLSX.utils.sheet_to_json<any>(sheet);
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const parsed = rows.map((row: any) => ({
-                          yearMonth: String(row["年月(YYYY-MM)"] || row["年月"] || "").trim(),
-                          storeCode: String(row["店コード"] || "").trim(),
-                          storeName: String(row["店名"] || "").trim(),
-                          salesAmount: Number(row["店売上"] || row["売上"] || 0),
-                          grossProfit: Number(row["当月荒利金額"] || row["荒利金額"] || row["荒利"] || 0),
-                          customerCount: Number(row["当年客数"] || row["客数"] || 0),
-                        })).filter((r: { yearMonth: string; salesAmount: number }) => r.yearMonth && r.salesAmount > 0);
-                        setExcelPreview(parsed);
-                      });
-                    } catch (err) {
+                    import("xlsx").then((XLSX) => {
+                      const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+                      const wb = XLSX.read(data, { type: "array" });
+                      const sheetName = wb.SheetNames.find((n: string) => n.includes("店別月別")) || wb.SheetNames[0];
+                      const sheet = wb.Sheets[sheetName];
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const rows = XLSX.utils.sheet_to_json<any>(sheet);
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const parsed = rows.map((row: any) => ({
+                        yearMonth: String(row["年月(YYYY-MM)"] || row["年月"] || "").trim(),
+                        storeCode: String(row["店コード"] || "").trim(),
+                        storeName: String(row["店名"] || "").trim(),
+                        salesAmount: Number(row["店売上"] || row["売上"] || 0),
+                        grossProfit: Number(row["当月荒利金額"] || row["荒利金額"] || row["荒利"] || 0),
+                        customerCount: Number(row["当年客数"] || row["客数"] || 0),
+                      })).filter((r: { yearMonth: string; salesAmount: number }) => r.yearMonth && r.salesAmount > 0);
+                      if (parsed.length === 0) {
+                        setMessage({ type: "error", text: `シート「${sheetName}」からデータを読み取れませんでした。列名を確認してください。\nシート一覧: ${wb.SheetNames.join(", ")}\n列名: ${rows.length > 0 ? Object.keys(rows[0]).join(", ") : "(行なし)"}` });
+                      } else {
+                        setMessage({ type: "success", text: `${parsed.length}件のデータを読み取りました。内容を確認して「一括取込」を押してください。` });
+                      }
+                      setExcelPreview(parsed);
+                    }).catch((err) => {
                       console.error("Excel parse error:", err);
-                    }
+                      setMessage({ type: "error", text: `Excelの読み込みに失敗しました: ${err?.message || err}` });
+                    });
+                  };
+                  reader.onerror = () => {
+                    setMessage({ type: "error", text: "ファイルの読み込みに失敗しました" });
                   };
                   reader.readAsArrayBuffer(f);
                 }
