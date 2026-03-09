@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions, type SessionUser } from "@/lib/auth";
 import { LogoutButton } from "@/components/LogoutButton";
+import { MobileMenuButton } from "@/components/MobileMenuButton";
 
 // ロール別のナビゲーション定義
 // minRole: このセクション/項目を表示する最低ロール
@@ -124,8 +125,13 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      {/* サイドバー */}
-      <aside className="w-64 bg-slate-800 text-white flex flex-col">
+      <MobileMenuButton />
+
+      {/* サイドバー - モバイルではスライドイン */}
+      <aside
+        id="sidebar"
+        className="fixed md:static inset-y-0 left-0 z-40 w-64 bg-slate-800 text-white flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out"
+      >
         <div className="p-4 border-b border-slate-700">
           <h1 className="text-lg font-bold">HR SaaS</h1>
           <p className="text-xs text-slate-400 mt-1">シフト管理システム</p>
@@ -172,8 +178,8 @@ export default async function DashboardLayout({
       </aside>
 
       {/* メインコンテンツ */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-6">{children}</div>
+      <main className="flex-1 overflow-auto w-full">
+        <div className="p-3 pt-14 md:p-6 md:pt-6">{children}</div>
       </main>
     </div>
   );

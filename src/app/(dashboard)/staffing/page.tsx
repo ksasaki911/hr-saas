@@ -56,10 +56,10 @@ export default function StaffingPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">必要人員設定</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">必要人員設定</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             部門×時間帯ごとの必要人数を設定
           </p>
         </div>
@@ -77,25 +77,25 @@ export default function StaffingPage() {
         <div className="space-y-6">
           {Object.values(grouped).map(({ dept, items }) => (
             <div key={dept.id} className="bg-white rounded-xl border overflow-hidden">
-              <div className="p-4 bg-slate-50 border-b">
-                <h3 className="font-bold text-gray-800">{dept.name}</h3>
+              <div className="p-3 sm:p-4 bg-slate-50 border-b">
+                <h3 className="text-sm sm:text-base font-bold text-gray-800">{dept.name}</h3>
               </div>
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="text-left p-3 text-xs font-medium text-gray-500 border-b">
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 border-b">
                       曜日
                     </th>
-                    <th className="text-left p-3 text-xs font-medium text-gray-500 border-b">
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 border-b">
                       時間帯
                     </th>
-                    <th className="text-right p-3 text-xs font-medium text-gray-500 border-b">
+                    <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 border-b">
                       最低人数
                     </th>
-                    <th className="text-right p-3 text-xs font-medium text-gray-500 border-b">
+                    <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 border-b">
                       理想人数
                     </th>
-                    <th className="text-center p-3 text-xs font-medium text-gray-500 border-b">
+                    <th className="text-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium text-gray-500 border-b">
                       祝日
                     </th>
                   </tr>
@@ -103,19 +103,19 @@ export default function StaffingPage() {
                 <tbody>
                   {items.map((req) => (
                     <tr key={req.id} className="hover:bg-gray-50">
-                      <td className="p-3 text-sm border-b">
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                         {DAY_LABELS[req.dayOfWeek]}
                       </td>
-                      <td className="p-3 text-sm border-b font-mono">
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-mono">
                         {req.timeSlot}
                       </td>
-                      <td className="p-3 text-sm border-b text-right font-medium">
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right font-medium">
                         {req.minStaff}人
                       </td>
-                      <td className="p-3 text-sm border-b text-right font-medium text-blue-600">
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right font-medium text-blue-600">
                         {req.idealStaff}人
                       </td>
-                      <td className="p-3 text-sm border-b text-center">
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-center">
                         {req.isHoliday ? "✓" : ""}
                       </td>
                     </tr>

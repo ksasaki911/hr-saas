@@ -334,18 +334,18 @@ export default function StoreDashboardPage() {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">店舗ダッシュボード</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">店舗ダッシュボード</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {data ? `${data.store.name} | 従業員${data.employeeCount}名` : "店舗を選択してください"}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="border rounded-lg px-3 py-2 text-sm"
+            className="border rounded-lg px-2 sm:px-3 py-2 text-sm flex-1 sm:flex-none"
           >
             {monthOptions.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -354,7 +354,7 @@ export default function StoreDashboardPage() {
           <select
             value={selectedStoreId}
             onChange={(e) => setSelectedStoreId(e.target.value)}
-            className="border rounded-lg px-4 py-2 text-sm"
+            className="border rounded-lg px-2 sm:px-4 py-2 text-sm flex-1 sm:flex-none"
           >
             {stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
@@ -366,14 +366,14 @@ export default function StoreDashboardPage() {
       {data && (
         <>
           {/* 期間表示 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center gap-6 text-sm">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center gap-2 sm:gap-6 text-xs sm:text-sm">
             <div><span className="text-blue-600 font-medium">対象月:</span> <span className="text-gray-700">{data.thisMonth.period}</span></div>
             <div><span className="text-gray-500 font-medium">前月:</span> <span className="text-gray-700">{data.lastMonth.period}</span></div>
             <div><span className="text-gray-500 font-medium">前年同月:</span> <span className="text-gray-700">{data.prevYear.period}</span></div>
           </div>
 
           {/* KPIカード: 今月 */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-4">
             <KpiCard
               label="人時数"
               value={`${fmtNum(data.thisMonth.workHours)}h`}
@@ -409,10 +409,10 @@ export default function StoreDashboardPage() {
           </div>
 
           {/* 前年同月比較 */}
-          <div className="bg-white rounded-xl shadow-sm border p-5">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">月次比較</h2>
+          <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+            <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">月次比較</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="px-3 py-2 text-left font-medium text-gray-600">指標</th>
@@ -447,9 +447,9 @@ export default function StoreDashboardPage() {
           </div>
 
           {/* ===== 週間人時比較セクション ===== */}
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-200 p-5">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-bold text-indigo-800">週間人時管理</h2>
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-200 p-3 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1">
+              <h2 className="text-sm sm:text-lg font-bold text-indigo-800">週間人時管理</h2>
               {data.availableWeeks && data.availableWeeks.length > 0 && (
                 <select
                   value={selectedWeek || data.selectedWeekStart}
@@ -469,7 +469,7 @@ export default function StoreDashboardPage() {
             </div>
 
             {/* 週次KPI */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-5">
               <KpiCard
                 label="対象週 人時数"
                 value={`${fmtNum(data.weeklyComparison.thisWeek.workHours)}h`}
@@ -498,10 +498,10 @@ export default function StoreDashboardPage() {
             </div>
 
             {/* 週次比較テーブル */}
-            <div className="bg-white rounded-lg border p-4 mb-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">週次比較</h3>
+            <div className="bg-white rounded-lg border p-3 sm:p-4 mb-3 sm:mb-5">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">週次比較</h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-xs sm:text-sm">
                   <thead>
                     <tr className="bg-gray-50">
                       <th className="px-3 py-2 text-left font-medium text-gray-600">指標</th>
@@ -536,22 +536,22 @@ export default function StoreDashboardPage() {
             </div>
 
             {/* 曜日別 対象週vs前週 + 8週トレンド */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="bg-white rounded-lg border p-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">曜日別人時数（対象週 vs 前週）</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-white rounded-lg border p-3 sm:p-4">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">曜日別人時数（対象週 vs 前週）</h3>
                 <canvas id="chart-week-vs-week" height="160" />
               </div>
-              <div className="bg-white rounded-lg border p-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">週次人時トレンド（8週間）</h3>
+              <div className="bg-white rounded-lg border p-3 sm:p-4">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">週次人時トレンド（8週間）</h3>
                 <canvas id="chart-weekly-trend" height="160" />
               </div>
             </div>
 
             {/* 対象週の曜日別詳細テーブル */}
-            <div className="bg-white rounded-lg border p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">対象週の曜日別詳細</h3>
+            <div className="bg-white rounded-lg border p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">対象週の曜日別詳細</h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-xs sm:text-sm">
                   <thead>
                     <tr className="bg-gray-50">
                       <th className="px-3 py-2 text-left font-medium text-gray-600">曜日</th>
@@ -609,15 +609,19 @@ export default function StoreDashboardPage() {
           </div>
 
           {/* チャート: 日別人時数 */}
-          <div className="bg-white rounded-xl shadow-sm border p-5">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">今月の日別人時数・出勤人数</h2>
-            <canvas id="chart-daily" height="100" />
+          <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+            <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">今月の日別人時数・出勤人数</h2>
+            <div className="overflow-x-auto -mx-1">
+              <div className="min-w-[400px]">
+                <canvas id="chart-daily" height="120" />
+              </div>
+            </div>
           </div>
 
           {/* 2カラム: 雇用区分別 + 対象週スケジュール */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border p-5">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">雇用区分別 人時構成（今月）</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
+            <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+              <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">雇用区分別 人時構成（今月）</h2>
               <canvas id="chart-emptype" height="200" />
               <div className="mt-4 space-y-2">
                 {data.byEmploymentType.map(t => (
@@ -630,10 +634,10 @@ export default function StoreDashboardPage() {
             </div>
 
             {/* 対象週の勤務表 */}
-            <div className="md:col-span-2 bg-white rounded-xl shadow-sm border p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-800">対象週の勤務実績</h2>
-                <div className="flex gap-1">
+            <div className="md:col-span-2 bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
+                <h2 className="text-sm sm:text-lg font-semibold text-gray-800">対象週の勤務実績</h2>
+                <div className="flex flex-wrap gap-1">
                   {[{ v: "ALL", l: "全て" }, ...Object.entries(EMP_TYPE_LABELS).map(([v, l]) => ({ v, l }))].map(opt => (
                     <button
                       key={opt.v}
@@ -715,9 +719,9 @@ function KpiCard({ label, value, change, sub, alert }: {
   alert?: boolean;
 }) {
   return (
-    <div className={`bg-white rounded-xl shadow-sm border p-4 ${alert ? "border-red-300 bg-red-50" : ""}`}>
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <div className={`text-xl font-bold ${alert ? "text-red-600" : "text-gray-900"}`}>{value}</div>
+    <div className={`bg-white rounded-xl shadow-sm border p-3 sm:p-4 ${alert ? "border-red-300 bg-red-50" : ""}`}>
+      <div className="text-[10px] sm:text-xs text-gray-500 mb-1">{label}</div>
+      <div className={`text-base sm:text-xl font-bold ${alert ? "text-red-600" : "text-gray-900"}`}>{value}</div>
       {change && (
         <div className="flex items-center gap-1 mt-1">
           <span className="text-xs text-gray-400">{sub}</span>

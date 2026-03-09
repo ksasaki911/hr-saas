@@ -182,30 +182,30 @@ export default function HQSupportPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">本部応援管理</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">本部応援管理</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             本部からの応援要員を登録・管理
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+          className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700"
         >
           + 応援登録
         </button>
       </div>
 
       {/* 週ナビ */}
-      <div className="flex items-center gap-4 mb-4">
-        <button onClick={() => moveWeek(-1)} className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4">
+        <button onClick={() => moveWeek(-1)} className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50">
           ← 前週
         </button>
-        <span className="font-medium text-gray-700">
+        <span className="font-medium text-gray-700 text-xs sm:text-sm">
           {weekStart} ～ {dateRange[dateRange.length - 1]}
         </span>
-        <button onClick={() => moveWeek(1)} className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50">
+        <button onClick={() => moveWeek(1)} className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50">
           翌週 →
         </button>
       </div>
@@ -228,17 +228,17 @@ export default function HQSupportPage() {
             const dow = new Date(date).getDay();
             return (
               <div key={date} className="bg-white rounded-xl border overflow-hidden">
-                <div className={`p-3 border-b ${dow === 0 ? "bg-red-50" : dow === 6 ? "bg-blue-50" : "bg-slate-50"}`}>
-                  <span className="text-sm font-semibold text-gray-700">
+                <div className={`p-2 sm:p-3 border-b ${dow === 0 ? "bg-red-50" : dow === 6 ? "bg-blue-50" : "bg-slate-50"}`}>
+                  <span className="text-xs sm:text-sm font-semibold text-gray-700">
                     {date} ({dayLabels[dow]}曜)
                   </span>
                   <span className="ml-2 text-xs text-gray-500">{daySupports.length}名</span>
                 </div>
                 {daySupports.map((sup) => (
-                  <div key={sup.id} className="p-3 border-b last:border-b-0 flex items-center gap-4">
+                  <div key={sup.id} className="p-2 sm:p-3 border-b last:border-b-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{sup.staffName}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-xs sm:text-sm">{sup.staffName}</span>
                         {sup.staffCode && (
                           <span className="text-xs text-gray-500 font-mono">{sup.staffCode}</span>
                         )}
@@ -246,7 +246,7 @@ export default function HQSupportPage() {
                           {STATUS_LABELS[sup.status]?.label || sup.status}
                         </span>
                       </div>
-                      <div className="text-xs text-gray-600 mt-1 flex gap-3">
+                      <div className="text-xs text-gray-600 mt-1 flex gap-1 sm:gap-3 flex-wrap">
                         <span>{sup.startTime}～{sup.endTime}</span>
                         {sup.departmentId && <span>部門: {DEPT_NAMES[sup.departmentId] || sup.departmentId}</span>}
                         {sup.note && <span className="text-gray-500">({sup.note})</span>}
@@ -261,11 +261,11 @@ export default function HQSupportPage() {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-0.5 sm:gap-1 flex-wrap">
                       {sup.status === "REQUESTED" && (
                         <button
                           onClick={() => updateStatus(sup.id, "CONFIRMED")}
-                          className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                          className="px-1.5 sm:px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                         >
                           確定
                         </button>
@@ -273,14 +273,14 @@ export default function HQSupportPage() {
                       {sup.status !== "CANCELLED" && (
                         <button
                           onClick={() => updateStatus(sup.id, "CANCELLED")}
-                          className="px-2 py-1 border text-gray-600 rounded text-xs hover:bg-gray-50"
+                          className="px-1.5 sm:px-2 py-1 border text-gray-600 rounded text-xs hover:bg-gray-50"
                         >
                           取消
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(sup.id)}
-                        className="px-2 py-1 text-red-600 rounded text-xs hover:bg-red-50"
+                        className="px-1.5 sm:px-2 py-1 text-red-600 rounded text-xs hover:bg-red-50"
                       >
                         削除
                       </button>
@@ -297,16 +297,16 @@ export default function HQSupportPage() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-bold">本部応援登録</h3>
+            <div className="p-4 sm:p-6 border-b">
+              <h3 className="text-base sm:text-lg font-bold">本部応援登録</h3>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">応援日 *</label>
                 <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 text-sm" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">応援者名 *</label>
                   <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)}
@@ -328,7 +328,7 @@ export default function HQSupportPage() {
                   ))}
                 </select>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">開始 *</label>
                   <input type="time" value={formStart} onChange={(e) => setFormStart(e.target.value)}
@@ -358,13 +358,13 @@ export default function HQSupportPage() {
                   placeholder="棚卸応援, 繁忙期応援 等" className="w-full border rounded-lg px-3 py-2 text-sm" />
               </div>
             </div>
-            <div className="p-6 border-t flex justify-end gap-2">
+            <div className="p-4 sm:p-6 border-t flex flex-col sm:flex-row justify-end gap-2">
               <button onClick={() => { setShowForm(false); resetForm(); }}
-                className="px-4 py-2 border rounded-lg text-sm">
+                className="w-full sm:w-auto px-4 py-2 border rounded-lg text-xs sm:text-sm">
                 キャンセル
               </button>
               <button onClick={handleSubmit} disabled={saving || !formDate || !formName}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50">
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm disabled:opacity-50">
                 {saving ? "登録中..." : "登録"}
               </button>
             </div>

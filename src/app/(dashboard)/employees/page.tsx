@@ -100,17 +100,17 @@ export default function EmployeesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">従業員一覧</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">従業員一覧</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             シフト対象の従業員を管理（スキル適合チェック付き）
           </p>
         </div>
         {alertCount > 0 && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
             <span className="text-red-600 text-lg">&#9888;</span>
-            <span className="text-sm text-red-700 font-medium">
+            <span className="text-xs sm:text-sm text-red-700 font-medium">
               必須スキル不足: {alertCount}名
             </span>
           </div>
@@ -118,15 +118,15 @@ export default function EmployeesPage() {
       </div>
 
       {/* 検索・フィルタ */}
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
         <input
           type="text"
           placeholder="氏名・社員番号で検索..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border rounded-lg px-3 py-2 text-sm w-72 focus:ring-2 focus:ring-blue-500"
+          className="border rounded-lg px-3 py-2 text-sm w-full sm:w-auto focus:ring-2 focus:ring-blue-500"
         />
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-xs sm:text-sm">
           <input
             type="checkbox"
             checked={filterAlert}
@@ -146,13 +146,13 @@ export default function EmployeesPage() {
           <table className="w-full">
             <thead>
               <tr className="bg-slate-50">
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">社員番号</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">氏名</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">雇用形態</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">部門</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">時給</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">保有スキル</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">適合</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">社員番号</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">氏名</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">雇用形態</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">部門</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">時給</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">保有スキル</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">適合</th>
               </tr>
             </thead>
             <tbody>
@@ -161,18 +161,18 @@ export default function EmployeesPage() {
                 const hasAlert = missing.length > 0;
                 return (
                   <tr key={emp.id} className={hasAlert ? "bg-red-50" : "hover:bg-gray-50"}>
-                    <td className="p-3 text-sm border-b font-mono">{emp.code}</td>
-                    <td className="p-3 text-sm border-b font-medium">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-mono">{emp.code}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-medium">
                       {emp.lastName} {emp.firstName}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {EMP_TYPE_LABELS[emp.employmentType] || emp.employmentType}
                     </td>
-                    <td className="p-3 text-sm border-b">{getDeptName(emp.departmentId)}</td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">{getDeptName(emp.departmentId)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {emp.hourlyWage ? `¥${emp.hourlyWage.toLocaleString()}` : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <div className="flex flex-wrap gap-1">
                         {emp.skills.map((skill) => (
                           <span
@@ -187,7 +187,7 @@ export default function EmployeesPage() {
                         )}
                       </div>
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {emp.departmentId ? (
                         hasAlert ? (
                           <div>
@@ -212,7 +212,7 @@ export default function EmployeesPage() {
               })}
               {displayEmployees.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-gray-500 text-sm">
+                  <td colSpan={7} className="p-4 sm:p-8 text-center text-gray-500 text-xs sm:text-sm">
                     {filterAlert ? "スキル不足の従業員はいません" : "従業員が見つかりません"}
                   </td>
                 </tr>
@@ -221,16 +221,16 @@ export default function EmployeesPage() {
           </table>
 
           {totalPages > 1 && (
-            <div className="p-3 bg-slate-50 border-t flex items-center justify-between text-xs text-gray-600">
-              <span>
+            <div className="p-2 sm:p-3 bg-slate-50 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-xs text-gray-600">
+              <span className="text-xs sm:text-sm">
                 {total}件中 {(page - 1) * limit + 1}〜{Math.min(page * limit, total)}件
               </span>
               <div className="flex gap-1">
                 <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-                  className="px-2 py-1 border rounded hover:bg-gray-100 disabled:opacity-50">前</button>
-                <span className="px-2 py-1">{page}/{totalPages}</span>
+                  className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm border rounded hover:bg-gray-100 disabled:opacity-50">前</button>
+                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm">{page}/{totalPages}</span>
                 <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="px-2 py-1 border rounded hover:bg-gray-100 disabled:opacity-50">次</button>
+                  className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm border rounded hover:bg-gray-100 disabled:opacity-50">次</button>
               </div>
             </div>
           )}

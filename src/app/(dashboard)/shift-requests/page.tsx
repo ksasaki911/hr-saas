@@ -260,10 +260,10 @@ export default function ShiftRequestsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">シフト希望</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">シフト希望</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             月間パターン登録と日別シフト希望の管理
           </p>
         </div>
@@ -297,16 +297,16 @@ export default function ShiftRequestsPage() {
       {tab === "pattern" && (
         <div className="space-y-4">
           {/* 従業員選択 + 月展開 */}
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">従業員</label>
+          <div className="flex flex-col sm:flex-row items-end gap-2 sm:gap-4">
+            <div className="flex-1 w-full">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">従業員</label>
               <select
                 value={selectedEmployee}
                 onChange={(e) => {
                   setSelectedEmployee(e.target.value);
                   setMessage(null);
                 }}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               >
                 <option value="">-- パート/アルバイトを選択 --</option>
                 {employees.map((emp) => (
@@ -317,12 +317,12 @@ export default function ShiftRequestsPage() {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">展開対象月</label>
+            <div className="w-full sm:w-auto">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">展開対象月</label>
               <select
                 value={yearMonth}
                 onChange={(e) => setYearMonth(e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               >
                 {monthOptions.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -332,7 +332,7 @@ export default function ShiftRequestsPage() {
             <button
               onClick={handleExpand}
               disabled={expanding}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap"
             >
               {expanding ? "展開中..." : "全員パターン展開"}
             </button>
@@ -351,8 +351,8 @@ export default function ShiftRequestsPage() {
           {/* パターン編集テーブル */}
           {selectedEmployee && (
             <div className="bg-white rounded-xl border overflow-hidden">
-              <div className="p-4 border-b bg-slate-50">
-                <h3 className="font-medium text-gray-700">
+              <div className="p-3 sm:p-4 border-b bg-slate-50">
+                <h3 className="text-sm sm:text-base font-medium text-gray-700">
                   {empName(selectedEmployee)} の週間パターン
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">
@@ -362,10 +362,10 @@ export default function ShiftRequestsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-slate-50">
-                    <th className="p-3 text-left text-sm font-medium text-gray-600 border-b w-20">曜日</th>
-                    <th className="p-3 text-left text-sm font-medium text-gray-600 border-b">種別</th>
-                    <th className="p-3 text-left text-sm font-medium text-gray-600 border-b">開始時刻</th>
-                    <th className="p-3 text-left text-sm font-medium text-gray-600 border-b">終了時刻</th>
+                    <th className="px-2 sm:px-3 py-1.5 sm:py-2 text-left text-xs sm:text-sm font-medium text-gray-600 border-b w-20">曜日</th>
+                    <th className="px-2 sm:px-3 py-1.5 sm:py-2 text-left text-xs sm:text-sm font-medium text-gray-600 border-b">種別</th>
+                    <th className="px-2 sm:px-3 py-1.5 sm:py-2 text-left text-xs sm:text-sm font-medium text-gray-600 border-b">開始時刻</th>
+                    <th className="px-2 sm:px-3 py-1.5 sm:py-2 text-left text-xs sm:text-sm font-medium text-gray-600 border-b">終了時刻</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -378,10 +378,10 @@ export default function ShiftRequestsPage() {
                         key={dow}
                         className={`hover:bg-gray-50 ${isWeekend ? "bg-orange-50/30" : ""}`}
                       >
-                        <td className="p-3 text-sm border-b font-medium">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-medium">
                           <span className={isWeekend ? "text-red-600" : ""}>{DOW_LABELS[dow]}曜</span>
                         </td>
-                        <td className="p-3 border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 border-b">
                           <div className="flex gap-1">
                             {TYPE_OPTIONS.map((opt) => (
                               <button
@@ -398,28 +398,28 @@ export default function ShiftRequestsPage() {
                             ))}
                           </div>
                         </td>
-                        <td className="p-3 border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 border-b">
                           {p.requestType !== "UNAVAILABLE" ? (
                             <input
                               type="time"
                               value={p.startTime}
                               onChange={(e) => updatePattern(dow, "startTime", e.target.value)}
-                              className="border rounded px-2 py-1 text-sm"
+                              className="border rounded px-2 py-1 text-xs sm:text-sm"
                             />
                           ) : (
-                            <span className="text-gray-300 text-sm">−</span>
+                            <span className="text-gray-300 text-xs sm:text-sm">−</span>
                           )}
                         </td>
-                        <td className="p-3 border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 border-b">
                           {p.requestType !== "UNAVAILABLE" ? (
                             <input
                               type="time"
                               value={p.endTime}
                               onChange={(e) => updatePattern(dow, "endTime", e.target.value)}
-                              className="border rounded px-2 py-1 text-sm"
+                              className="border rounded px-2 py-1 text-xs sm:text-sm"
                             />
                           ) : (
-                            <span className="text-gray-300 text-sm">−</span>
+                            <span className="text-gray-300 text-xs sm:text-sm">−</span>
                           )}
                         </td>
                       </tr>
@@ -427,11 +427,11 @@ export default function ShiftRequestsPage() {
                   })}
                 </tbody>
               </table>
-              <div className="p-4 border-t flex justify-end">
+              <div className="p-3 sm:p-4 border-t flex justify-end">
                 <button
                   onClick={handleSavePatterns}
                   disabled={saving}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                  className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 disabled:opacity-50"
                 >
                   {saving ? "保存中..." : "パターンを保存"}
                 </button>
@@ -461,17 +461,17 @@ export default function ShiftRequestsPage() {
       {/* ====== 展開済み一覧タブ ====== */}
       {tab === "requests" && (
         <div>
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4">
             <button
               onClick={() => moveMonth(-1)}
-              className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+              className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50"
             >
               ← 前月
             </button>
             <span className="font-medium text-gray-700">{displayMonth}</span>
             <button
               onClick={() => moveMonth(1)}
-              className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+              className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50"
             >
               翌月 →
             </button>
@@ -490,12 +490,12 @@ export default function ShiftRequestsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-slate-50">
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">日付</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">曜日</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">従業員</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">種別</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">時間帯</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">備考</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">日付</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">曜日</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">従業員</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">種別</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">時間帯</th>
+                    <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">備考</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -505,37 +505,37 @@ export default function ShiftRequestsPage() {
                     const isWeekend = dow === 0 || dow === 6;
                     return (
                       <tr key={req.id} className={`hover:bg-gray-50 ${isWeekend ? "bg-orange-50/30" : ""}`}>
-                        <td className="p-3 text-sm border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                           {d.toLocaleDateString("ja-JP")}
                         </td>
-                        <td className="p-3 text-sm border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                           <span className={isWeekend ? "text-red-600 font-medium" : ""}>
                             {DOW_LABELS[dow]}
                           </span>
                         </td>
-                        <td className="p-3 text-sm border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                           <span className="font-medium">
                             {req.employee.lastName} {req.employee.firstName}
                           </span>
                           <span className="text-xs text-gray-400 ml-2">{req.employee.code}</span>
                         </td>
-                        <td className="p-3 text-sm border-b">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${TYPE_COLORS[req.requestType] || ""}`}>
                             {TYPE_OPTIONS.find((o) => o.value === req.requestType)?.label || req.requestType}
                           </span>
                         </td>
-                        <td className="p-3 text-sm border-b text-gray-600">
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-gray-600">
                           {req.startTime && req.endTime
                             ? `${req.startTime}〜${req.endTime}`
                             : "−"}
                         </td>
-                        <td className="p-3 text-sm border-b text-gray-500">{req.note || "−"}</td>
+                        <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-gray-500">{req.note || "−"}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-              <div className="p-3 bg-slate-50 border-t text-xs text-gray-600">
+              <div className="px-2 sm:px-3 py-2 bg-slate-50 border-t text-xs text-gray-600">
                 合計: {requests.length}件
               </div>
             </div>

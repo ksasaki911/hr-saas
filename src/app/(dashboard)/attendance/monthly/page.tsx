@@ -69,53 +69,53 @@ export default function MonthlyAttendancePage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">月次勤怠集計</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">月次勤怠集計</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             従業員ごとの月次勤務実績サマリー
           </p>
         </div>
       </div>
 
       {/* 月ナビ */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4">
         <button
           onClick={() => moveMonth(-1)}
-          className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+          className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50"
         >
           ← 前月
         </button>
         <span className="font-medium text-gray-700">{displayMonth}</span>
         <button
           onClick={() => moveMonth(1)}
-          className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+          className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50"
         >
           翌月 →
         </button>
       </div>
 
       {/* サマリーカード */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
-        <div className="bg-white rounded-xl border p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-6">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">対象人数</div>
-          <div className="text-xl font-bold text-gray-800 mt-1">{summaries.length}名</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-800 mt-1">{summaries.length}名</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">総勤務時間</div>
-          <div className="text-xl font-bold text-gray-800 mt-1">{totalHours.toFixed(1)}h</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-800 mt-1">{totalHours.toFixed(1)}h</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">総残業時間</div>
-          <div className="text-xl font-bold text-orange-600 mt-1">{totalOvertime.toFixed(1)}h</div>
+          <div className="text-lg sm:text-xl font-bold text-orange-600 mt-1">{totalOvertime.toFixed(1)}h</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">遅刻/欠勤</div>
-          <div className="text-xl font-bold text-yellow-600 mt-1">{totalLate}/{totalAbsent}</div>
+          <div className="text-lg sm:text-xl font-bold text-yellow-600 mt-1">{totalLate}/{totalAbsent}</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">総人件費</div>
-          <div className="text-xl font-bold text-gray-800 mt-1">¥{totalCost.toLocaleString()}</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-800 mt-1">¥{totalCost.toLocaleString()}</div>
         </div>
       </div>
 
@@ -130,19 +130,19 @@ export default function MonthlyAttendancePage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="bg-slate-50">
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">社員番号</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">氏名</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">雇用形態</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">出勤日数</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">勤務時間</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">残業時間</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">遅刻</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">欠勤</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">早退</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">人件費</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">社員番号</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">氏名</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">雇用形態</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">出勤日数</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">勤務時間</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">残業時間</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">遅刻</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">欠勤</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">早退</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">人件費</th>
               </tr>
             </thead>
             <tbody>
@@ -152,11 +152,11 @@ export default function MonthlyAttendancePage() {
                   : emp.employmentType === "PART_TIME" ? "パート" : emp.employmentType;
                 return (
                   <tr key={emp.id} className="hover:bg-gray-50">
-                    <td className="p-3 text-sm border-b">{emp.code}</td>
-                    <td className="p-3 text-sm border-b font-medium">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">{emp.code}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-medium">
                       {emp.lastName} {emp.firstName}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                         emp.employmentType === "FULL_TIME"
                           ? "bg-indigo-100 text-indigo-800"
@@ -165,21 +165,21 @@ export default function MonthlyAttendancePage() {
                         {typeLabel}
                       </span>
                     </td>
-                    <td className="p-3 text-sm border-b text-right">{s.totalWorkDays}日</td>
-                    <td className="p-3 text-sm border-b text-right">{s.totalWorkHours}h</td>
-                    <td className="p-3 text-sm border-b text-right text-orange-600">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">{s.totalWorkDays}日</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">{s.totalWorkHours}h</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right text-orange-600">
                       {s.totalOvertimeHours > 0 ? `${s.totalOvertimeHours}h` : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {s.totalLateDays > 0 ? <span className="text-yellow-600">{s.totalLateDays}</span> : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {s.totalAbsentDays > 0 ? <span className="text-red-600">{s.totalAbsentDays}</span> : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {s.totalEarlyLeaveDays > 0 ? <span className="text-orange-600">{s.totalEarlyLeaveDays}</span> : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right font-medium">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right font-medium">
                       ¥{s.totalLaborCost.toLocaleString()}
                     </td>
                   </tr>
@@ -187,7 +187,7 @@ export default function MonthlyAttendancePage() {
               })}
             </tbody>
           </table>
-          <div className="p-3 bg-slate-50 border-t text-xs text-gray-600">
+          <div className="px-2 sm:px-3 py-2 bg-slate-50 border-t text-xs text-gray-600">
             {summaries.length}名の集計 | 総人件費: ¥{totalCost.toLocaleString()}
           </div>
         </div>

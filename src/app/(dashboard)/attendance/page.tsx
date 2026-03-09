@@ -140,22 +140,22 @@ export default function AttendancePage() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">打刻</h2>
-        <p className="text-sm text-gray-500 mt-1">出勤・退勤の打刻を行います</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">打刻</h2>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">出勤・退勤の打刻を行います</p>
       </div>
 
       {/* 打刻操作エリア */}
-      <div className="bg-white rounded-xl border p-6 mb-6">
+      <div className="bg-white rounded-xl border p-3 sm:p-6 mb-6">
         <div className="text-center mb-6">
-          <div className="text-3xl font-bold text-gray-800">{today}</div>
-          <div className="text-lg text-gray-500 mt-1">
+          <div className="text-2xl sm:text-3xl font-bold text-gray-800">{today}</div>
+          <div className="text-base sm:text-lg text-gray-500 mt-1">
             {new Date().toLocaleDateString("ja-JP", { weekday: "long" })}
           </div>
         </div>
 
         <div className="max-w-md mx-auto space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               従業員を選択
             </label>
             <select
@@ -164,7 +164,7 @@ export default function AttendancePage() {
                 setSelectedEmployee(e.target.value);
                 setMessage(null);
               }}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="w-full sm:w-auto border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm"
             >
               <option value="">-- 選択してください --</option>
               {employees.map((emp) => (
@@ -176,36 +176,36 @@ export default function AttendancePage() {
           </div>
 
           {selectedEmployee && selectedRecord && (
-            <div className="text-center text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+            <div className="text-center text-xs sm:text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
               現在のステータス:{" "}
               <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_LABELS[selectedRecord.status]?.color || ""}`}>
                 {STATUS_LABELS[selectedRecord.status]?.label || selectedRecord.status}
               </span>
               {selectedRecord.clockIn && (
-                <span className="ml-3">
+                <span className="block sm:inline ml-0 sm:ml-3 mt-1 sm:mt-0">
                   出勤: {new Date(selectedRecord.clockIn).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
               {selectedRecord.clockOut && (
-                <span className="ml-3">
+                <span className="block sm:inline ml-0 sm:ml-3 mt-1 sm:mt-0">
                   退勤: {new Date(selectedRecord.clockOut).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
             </div>
           )}
 
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row sm:justify-center gap-2 sm:gap-4">
             <button
               onClick={handleClockIn}
               disabled={!selectedEmployee || !canClockIn || processing}
-              className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 sm:px-8 py-2 sm:py-3 bg-blue-600 text-white rounded-xl font-medium text-xs sm:text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               出勤
             </button>
             <button
               onClick={handleClockOut}
               disabled={!selectedEmployee || !canClockOut || processing}
-              className="px-8 py-3 bg-orange-600 text-white rounded-xl font-medium text-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 sm:px-8 py-2 sm:py-3 bg-orange-600 text-white rounded-xl font-medium text-xs sm:text-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               退勤
             </button>
@@ -213,7 +213,7 @@ export default function AttendancePage() {
 
           {message && (
             <div
-              className={`text-center p-3 rounded-lg text-sm ${
+              className={`text-center p-3 rounded-lg text-xs sm:text-sm ${
                 message.type === "success"
                   ? "bg-green-50 text-green-700"
                   : "bg-red-50 text-red-700"
@@ -227,8 +227,8 @@ export default function AttendancePage() {
 
       {/* 本日の打刻状況一覧 */}
       <div className="bg-white rounded-xl border overflow-hidden">
-        <div className="p-4 border-b bg-slate-50">
-          <h3 className="font-medium text-gray-700">本日の打刻状況</h3>
+        <div className="p-3 sm:p-4 border-b bg-slate-50">
+          <h3 className="font-medium text-sm sm:text-base text-gray-700">本日の打刻状況</h3>
         </div>
         {loading ? (
           <div className="flex items-center justify-center h-32">
@@ -242,11 +242,11 @@ export default function AttendancePage() {
           <table className="w-full">
             <thead>
               <tr className="bg-slate-50">
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">社員番号</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">氏名</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">出勤時刻</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">退勤時刻</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">ステータス</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">社員番号</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">氏名</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">出勤時刻</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">退勤時刻</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">ステータス</th>
               </tr>
             </thead>
             <tbody>
@@ -254,21 +254,21 @@ export default function AttendancePage() {
                 const statusInfo = STATUS_LABELS[rec.status] || { label: rec.status, color: "" };
                 return (
                   <tr key={rec.id} className="hover:bg-gray-50">
-                    <td className="p-3 text-sm border-b">{rec.employee.code}</td>
-                    <td className="p-3 text-sm border-b font-medium">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">{rec.employee.code}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b font-medium">
                       {rec.employee.lastName} {rec.employee.firstName}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {rec.clockIn
                         ? new Date(rec.clockIn).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })
                         : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {rec.clockOut
                         ? new Date(rec.clockOut).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })
                         : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusInfo.color}`}>
                         {statusInfo.label}
                       </span>

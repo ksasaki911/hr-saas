@@ -299,18 +299,18 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">勤怠ダッシュボード</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">勤怠ダッシュボード</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {data.summary.dateRange.from?.split("T")[0]} 〜 {data.summary.dateRange.to?.split("T")[0]} |
-            {formatNum(data.summary.totalRecords)}件の勤怠レコード
+            {formatNum(data.summary.totalRecords)}件
           </p>
         </div>
         <select
           value={selectedStore}
           onChange={(e) => setSelectedStore(e.target.value)}
-          className="border rounded-lg px-4 py-2 text-sm"
+          className="border rounded-lg px-3 py-2 text-sm w-full sm:w-auto"
         >
           <option value="ALL">全店舗</option>
           {data.stores.map(s => (
@@ -320,7 +320,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPIカード */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
         <KpiCard label="月平均労働時間" value={`${formatNum(kpis.avgMonthlyWorkHours)}h`}
           sub={`総計 ${formatNum(kpis.totalWorkHours)}h`}
           yoy={kpis.yoyWorkHours} />
@@ -335,37 +335,41 @@ export default function DashboardPage() {
       </div>
 
       {/* チャート: 月別推移 */}
-      <div className="bg-white rounded-xl shadow-sm border p-5">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">月別 労働時間・残業・人件費推移</h2>
-        <canvas id="chart-monthly" height="100" />
+      <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">月別 労働時間・残業・人件費推移</h2>
+        <div className="overflow-x-auto -mx-1">
+          <div className="min-w-[400px]">
+            <canvas id="chart-monthly" height="120" />
+          </div>
+        </div>
       </div>
 
       {/* チャート2段 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border p-5">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">曜日別 平均労働時間</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
+        <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+          <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">曜日別 平均労働時間</h2>
           <canvas id="chart-dow" height="160" />
         </div>
-        <div className="bg-white rounded-xl shadow-sm border p-5">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">店舗別 従業員構成</h2>
+        <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+          <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">店舗別 従業員構成</h2>
           <canvas id="chart-emp-breakdown" height="160" />
         </div>
       </div>
 
       {/* テーブル: 店舗別従業員構成 */}
       {data.storeEmpBreakdown.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border p-5">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">店舗別 従業員構成（テーブル）</h2>
+        <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+          <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">店舗別 従業員構成（テーブル）</h2>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs sm:text-sm">
               <thead>
                 <tr className="bg-gray-50 text-left">
-                  <th className="px-3 py-2 font-medium text-gray-600">店舗</th>
-                  <th className="px-3 py-2 font-medium text-gray-600 text-right">正社員</th>
-                  <th className="px-3 py-2 font-medium text-gray-600 text-right">パート</th>
-                  <th className="px-3 py-2 font-medium text-gray-600 text-right">アルバイト</th>
-                  <th className="px-3 py-2 font-medium text-gray-600 text-right">契約</th>
-                  <th className="px-3 py-2 font-medium text-gray-600 text-right">合計</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600">店舗</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">正社員</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">パート</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">アルバイト</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">契約</th>
+                  <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">合計</th>
                 </tr>
               </thead>
               <tbody>
@@ -373,12 +377,12 @@ export default function DashboardPage() {
                   .sort((a, b) => b.total - a.total)
                   .map((s, i) => (
                     <tr key={s.storeId} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                      <td className="px-3 py-2 font-medium">{s.storeName}</td>
-                      <td className="px-3 py-2 text-right">{s.fullTime}</td>
-                      <td className="px-3 py-2 text-right">{s.partTime}</td>
-                      <td className="px-3 py-2 text-right">{s.arbeit}</td>
-                      <td className="px-3 py-2 text-right">{s.contract}</td>
-                      <td className="px-3 py-2 text-right font-medium">{s.total}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium">{s.storeName}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{s.fullTime}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{s.partTime}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{s.arbeit}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{s.contract}</td>
+                      <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right font-medium">{s.total}</td>
                     </tr>
                   ))}
               </tbody>
@@ -388,26 +392,30 @@ export default function DashboardPage() {
       )}
 
       {/* チャート: 店舗別人件費推移 */}
-      <div className="bg-white rounded-xl shadow-sm border p-5">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">店舗別 月次人件費推移（上位10店舗）</h2>
-        <canvas id="chart-store-cost" height="100" />
+      <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">店舗別 月次人件費推移（上位10店舗）</h2>
+        <div className="overflow-x-auto -mx-1">
+          <div className="min-w-[400px]">
+            <canvas id="chart-store-cost" height="120" />
+          </div>
+        </div>
       </div>
 
       {/* テーブル: 店舗別月次サマリ */}
-      <div className="bg-white rounded-xl shadow-sm border p-5">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">月次データ一覧</h2>
+      <div className="bg-white rounded-xl shadow-sm border p-3 sm:p-5">
+        <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">月次データ一覧</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="bg-gray-50 text-left">
-                <th className="px-3 py-2 font-medium text-gray-600">月</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">出勤人数</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">出勤延べ日数</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">労働時間</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">残業時間</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">残業率</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">人件費</th>
-                <th className="px-3 py-2 font-medium text-gray-600 text-right">遅刻</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600">月</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">出勤人数</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">延べ日数</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">労働時間</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">残業</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">残業率</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">人件費</th>
+                <th className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium text-gray-600 text-right">遅刻</th>
               </tr>
             </thead>
             <tbody>
@@ -415,14 +423,14 @@ export default function DashboardPage() {
                 const otRate = r.workHours > 0 ? (r.overtimeHours / r.workHours * 100).toFixed(1) : "0";
                 return (
                   <tr key={r.month} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-3 py-2 font-medium">{r.month}</td>
-                    <td className="px-3 py-2 text-right">{formatNum(r.employees)}</td>
-                    <td className="px-3 py-2 text-right">{formatNum(r.attendanceDays)}</td>
-                    <td className="px-3 py-2 text-right">{formatNum(r.workHours)}h</td>
-                    <td className="px-3 py-2 text-right">{formatNum(r.overtimeHours)}h</td>
-                    <td className="px-3 py-2 text-right">{otRate}%</td>
-                    <td className="px-3 py-2 text-right">{formatYen(r.laborCost)}</td>
-                    <td className="px-3 py-2 text-right">{formatNum(r.lateDays)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 font-medium whitespace-nowrap">{r.month}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatNum(r.employees)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatNum(r.attendanceDays)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatNum(r.workHours)}h</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatNum(r.overtimeHours)}h</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{otRate}%</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatYen(r.laborCost)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-right">{formatNum(r.lateDays)}</td>
                   </tr>
                 );
               })}
@@ -439,13 +447,13 @@ function KpiCard({ label, value, sub, yoy, alert }: {
   yoy?: number | null; alert?: boolean;
 }) {
   return (
-    <div className={`bg-white rounded-xl shadow-sm border p-5 ${alert ? "border-red-300" : ""}`}>
-      <div className="text-sm text-gray-500 mb-1">{label}</div>
-      <div className={`text-2xl font-bold ${alert ? "text-red-600" : "text-gray-900"}`}>{value}</div>
-      <div className="flex items-center gap-2 mt-1">
-        {sub && <span className="text-xs text-gray-400">{sub}</span>}
+    <div className={`bg-white rounded-xl shadow-sm border p-3 sm:p-5 ${alert ? "border-red-300" : ""}`}>
+      <div className="text-xs sm:text-sm text-gray-500 mb-1">{label}</div>
+      <div className={`text-lg sm:text-2xl font-bold ${alert ? "text-red-600" : "text-gray-900"}`}>{value}</div>
+      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+        {sub && <span className="text-[10px] sm:text-xs text-gray-400">{sub}</span>}
         {yoy !== null && yoy !== undefined && (
-          <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${yoy >= 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+          <span className={`text-[10px] sm:text-xs font-medium px-1 sm:px-1.5 py-0.5 rounded ${yoy >= 0 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
             前年比 {yoy >= 0 ? "+" : ""}{yoy}%
           </span>
         )}

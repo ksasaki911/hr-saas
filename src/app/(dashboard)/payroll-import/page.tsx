@@ -393,34 +393,34 @@ function PayrollImportPanel() {
 // ============================================================
 function ImportResultPanel({ result }: { result: ImportResult }) {
   return (
-    <div className="bg-white rounded-lg border p-4 space-y-3">
-      <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+    <div className="bg-white rounded-lg border p-2 sm:p-4 space-y-3">
+      <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700">
         {result.dryRun ? "🔍 検証結果（まだ取込していません）" : "📊 取込結果"}
       </div>
-      <div className="grid grid-cols-4 gap-3 text-center">
-        <div className="bg-gray-50 rounded-lg p-3">
-          <div className="text-xl font-bold">{result.total}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-center">
+        <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
+          <div className="text-lg sm:text-xl font-bold">{result.total}</div>
           <div className="text-xs text-gray-500">合計</div>
         </div>
-        <div className="bg-green-50 rounded-lg p-3">
-          <div className="text-xl font-bold text-green-700">{result.created}</div>
+        <div className="bg-green-50 rounded-lg p-2 sm:p-3">
+          <div className="text-lg sm:text-xl font-bold text-green-700">{result.created}</div>
           <div className="text-xs text-gray-500">新規</div>
         </div>
-        <div className="bg-blue-50 rounded-lg p-3">
-          <div className="text-xl font-bold text-blue-700">{result.updated}</div>
+        <div className="bg-blue-50 rounded-lg p-2 sm:p-3">
+          <div className="text-lg sm:text-xl font-bold text-blue-700">{result.updated}</div>
           <div className="text-xs text-gray-500">更新</div>
         </div>
-        <div className="bg-red-50 rounded-lg p-3">
-          <div className="text-xl font-bold text-red-700">{result.skipped}</div>
+        <div className="bg-red-50 rounded-lg p-2 sm:p-3">
+          <div className="text-lg sm:text-xl font-bold text-red-700">{result.skipped}</div>
           <div className="text-xs text-gray-500">スキップ</div>
         </div>
       </div>
 
       {/* 給与集計サマリ */}
       {result.summary && (
-        <div className="bg-blue-50 rounded-lg p-3 text-sm">
+        <div className="bg-blue-50 rounded-lg p-2 sm:p-3 text-xs sm:text-sm">
           <p className="font-semibold text-blue-800 mb-1">集計サマリ</p>
-          <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 text-xs">
             <div>
               <span className="text-blue-600">支給総額合計:</span>
               <span className="font-medium ml-1">{formatCurrency(result.summary.totalPayment)}</span>
@@ -636,14 +636,14 @@ export default function PayrollImportPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">給与奉行連携</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">給与奉行連携</h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">
           給与奉行から出力したCSVファイルをそのままアップロード
         </p>
       </div>
 
       {/* タブ */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex overflow-x-auto border-b border-gray-200">
         {[
           { key: "employee" as const, label: "① 従業員マスタ取込", icon: "👥" },
           { key: "payroll" as const, label: "② 給与実績取込", icon: "💰" },
@@ -652,7 +652,7 @@ export default function PayrollImportPage() {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            className={`px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors flex items-center gap-1 sm:gap-2 whitespace-nowrap ${
               tab === t.key
                 ? "border-blue-600 text-blue-600"
                 : "border-transparent text-gray-500 hover:text-gray-700"
@@ -666,8 +666,8 @@ export default function PayrollImportPage() {
 
       {/* 注意事項 */}
       {tab !== "fix" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
-          <p className="font-semibold mb-1">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-blue-800">
+          <p className="font-semibold mb-1 text-sm">
             {tab === "employee" ? "Step 1: まず従業員マスタを取込" : "Step 2: 次に給与実績を取込"}
           </p>
           <p className="text-xs text-blue-600">

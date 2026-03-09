@@ -161,10 +161,10 @@ export default function ShiftsPage() {
   return (
     <div>
       {/* ===== ヘッダー ===== */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4">
         <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-800">シフト管理</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">シフト管理</h2>
             {/* 店舗セレクター */}
             {stores.length > 1 ? (
               <select
@@ -174,7 +174,7 @@ export default function ShiftsPage() {
                   setStoreId(e.target.value);
                   setStoreName(selected?.name || "");
                 }}
-                className="px-3 py-1.5 text-sm border rounded-lg bg-white text-gray-700 font-medium"
+                className="w-full sm:w-auto px-3 py-1.5 text-sm border rounded-lg bg-white text-gray-700 font-medium"
               >
                 {stores.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -189,9 +189,9 @@ export default function ShiftsPage() {
             ) : null}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           {/* ビュー切り替え */}
-          <div className="flex bg-gray-100 rounded-lg p-0.5 mr-2">
+          <div className="flex bg-gray-100 rounded-lg p-0.5">
             <button
               onClick={() => setViewMode("board")}
               className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
@@ -217,7 +217,7 @@ export default function ShiftsPage() {
           {draftCount > 0 && (
             <button
               onClick={handlePublishAll}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs sm:text-sm hover:bg-green-700 transition-colors whitespace-nowrap"
             >
               一括公開（{draftCount}件）
             </button>
@@ -225,7 +225,7 @@ export default function ShiftsPage() {
           <button
             onClick={() => setShowGenerate(true)}
             disabled={!storeId}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap ${
               storeId
                 ? "bg-purple-600 text-white hover:bg-purple-700"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -235,7 +235,7 @@ export default function ShiftsPage() {
           </button>
           <button
             onClick={() => handleAddShift()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
           >
             + シフト追加
           </button>
@@ -243,17 +243,17 @@ export default function ShiftsPage() {
       </div>
 
       {/* ===== 週ナビゲーション + 日付セレクター ===== */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
         <button
           onClick={() => moveWeek(-1)}
-          className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+          className="px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50 whitespace-nowrap"
         >
           ← 前週
         </button>
 
         {/* 曜日タブ（ボードモード時のみ） */}
         {viewMode === "board" ? (
-          <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
+          <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5 overflow-x-auto">
             {weekDates.map((date) => {
               const d = new Date(date + "T00:00:00");
               const dow = d.getDay();
@@ -264,7 +264,7 @@ export default function ShiftsPage() {
                 <button
                   key={date}
                   onClick={() => setSelectedDate(date)}
-                  className={`px-3 py-1.5 text-xs rounded-md transition-colors min-w-[60px] ${
+                  className={`px-2 sm:px-3 py-1.5 text-xs rounded-md transition-colors min-w-[50px] sm:min-w-[60px] flex-shrink-0 ${
                     isSelected
                       ? "bg-white text-gray-800 shadow-sm font-bold"
                       : isWeekend
@@ -284,14 +284,14 @@ export default function ShiftsPage() {
             })}
           </div>
         ) : (
-          <span className="font-medium text-gray-700">
+          <span className="font-medium text-xs sm:text-sm text-gray-700 whitespace-nowrap">
             {weekDates[0]} ～ {weekDates[6]}
           </span>
         )}
 
         <button
           onClick={() => moveWeek(1)}
-          className="px-3 py-1.5 text-sm bg-white border rounded-lg hover:bg-gray-50"
+          className="px-3 py-1.5 text-xs sm:text-sm bg-white border rounded-lg hover:bg-gray-50 whitespace-nowrap"
         >
           翌週 →
         </button>
@@ -302,7 +302,7 @@ export default function ShiftsPage() {
             setWeekStart(localDateStr(d));
             setSelectedDate(localDateStr(new Date()));
           }}
-          className="px-3 py-1.5 text-sm text-blue-600 hover:underline"
+          className="px-3 py-1.5 text-xs sm:text-sm text-blue-600 hover:underline whitespace-nowrap"
         >
           今日
         </button>

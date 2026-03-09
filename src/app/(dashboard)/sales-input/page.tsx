@@ -204,17 +204,17 @@ export default function SalesInputPage() {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">売上データ入力</h1>
-          <p className="text-sm text-gray-500 mt-1">日別売上の手入力・CSV取込</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">売上データ入力</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">日別売上の手入力・CSV取込</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {stores.length > 1 && (
             <select
               value={selectedStoreId}
               onChange={(e) => setSelectedStoreId(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
             >
               {stores.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -225,7 +225,7 @@ export default function SalesInputPage() {
       </div>
 
       {/* タブ */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex overflow-x-auto border-b border-gray-200">
         {[
           { key: "list" as const, label: "売上一覧" },
           { key: "input" as const, label: "手入力" },
@@ -235,7 +235,7 @@ export default function SalesInputPage() {
           <button
             key={t.key}
             onClick={() => { setTab(t.key); setMessage(null); }}
-            className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               tab === t.key
                 ? "border-blue-600 text-blue-600"
                 : "border-transparent text-gray-500 hover:text-gray-700"
@@ -262,14 +262,14 @@ export default function SalesInputPage() {
       {/* 売上一覧 */}
       {tab === "list" && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
             <h3 className="text-sm font-semibold text-gray-700">
               {stores.find((s) => s.id === selectedStoreId)?.name || ""} 売上一覧
             </h3>
             <select
               value={listMonth}
               onChange={(e) => setListMonth(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 text-sm"
+              className="w-full sm:w-auto border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm"
             >
               {(() => {
                 const opts: React.ReactElement[] = [];
@@ -292,16 +292,16 @@ export default function SalesInputPage() {
               この期間の売上データはありません
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-xs sm:text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">日付</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">売上金額</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">荒利高</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">荒利率</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">客数</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">客単価</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">備考</th>
+                  <th className="text-left px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">日付</th>
+                  <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">売上金額</th>
+                  <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">荒利高</th>
+                  <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">荒利率</th>
+                  <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">客数</th>
+                  <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">客単価</th>
+                  <th className="text-left px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">備考</th>
                 </tr>
               </thead>
               <tbody>
@@ -314,23 +314,23 @@ export default function SalesInputPage() {
                     : null;
                   return (
                     <tr key={s.id} className="border-t border-gray-50">
-                      <td className="px-4 py-3">{formatDate(s.salesDate)}</td>
-                      <td className="px-4 py-3 text-right font-medium">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3">{formatDate(s.salesDate)}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-medium">
                         {s.salesAmount.toLocaleString()}円
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                         {s.grossProfit != null ? `${s.grossProfit.toLocaleString()}円` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                         {grossMarginRate != null ? `${grossMarginRate}%` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                         {s.customerCount != null ? `${s.customerCount}人` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                         {unitPrice != null ? `${unitPrice.toLocaleString()}円` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">{s.note || ""}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-500">{s.note || ""}</td>
                     </tr>
                   );
                 })}
@@ -342,13 +342,13 @@ export default function SalesInputPage() {
                   const gpRate = totalGP > 0 && totalSales > 0 ? Math.round((totalGP / totalSales) * 1000) / 10 : null;
                   return (
                     <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold">
-                      <td className="px-4 py-3">合計</td>
-                      <td className="px-4 py-3 text-right">{totalSales.toLocaleString()}円</td>
-                      <td className="px-4 py-3 text-right">{totalGP > 0 ? `${totalGP.toLocaleString()}円` : "-"}</td>
-                      <td className="px-4 py-3 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
-                      <td className="px-4 py-3 text-right">{totalCust.toLocaleString()}人</td>
-                      <td className="px-4 py-3 text-right">-</td>
-                      <td className="px-4 py-3">{salesData.length}日分</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3">合計</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{totalSales.toLocaleString()}円</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{totalGP > 0 ? `${totalGP.toLocaleString()}円` : "-"}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{totalCust.toLocaleString()}人</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">-</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3">{salesData.length}日分</td>
                     </tr>
                   );
                 })()}
@@ -360,21 +360,21 @@ export default function SalesInputPage() {
 
       {/* 手入力フォーム */}
       {tab === "input" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-lg">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">売上データ手入力</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-6 max-w-lg">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-4">売上データ手入力</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">日付 *</label>
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">日付 *</label>
               <input
                 type="date"
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">売上金額 *</label>
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">売上金額 *</label>
               <input
                 type="number"
                 value={formAmount}
@@ -382,45 +382,45 @@ export default function SalesInputPage() {
                 required
                 min="0"
                 placeholder="例: 1500000"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">荒利高</label>
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">荒利高</label>
               <input
                 type="number"
                 value={formGrossProfit}
                 onChange={(e) => setFormGrossProfit(e.target.value)}
                 min="0"
                 placeholder="例: 450000"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">客数</label>
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">客数</label>
               <input
                 type="number"
                 value={formCustomers}
                 onChange={(e) => setFormCustomers(e.target.value)}
                 min="0"
                 placeholder="例: 450"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">備考</label>
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">備考</label>
               <input
                 type="text"
                 value={formNote}
                 onChange={(e) => setFormNote(e.target.value)}
                 placeholder="特記事項があれば"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <button
               type="submit"
               disabled={saving || !formAmount}
-              className="w-full bg-blue-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="w-full bg-blue-600 text-white rounded-lg py-2.5 text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {saving ? "保存中..." : "保存（既存データは上書き更新）"}
             </button>
@@ -434,7 +434,7 @@ export default function SalesInputPage() {
       {/* CSV取込 */}
       {tab === "csv" && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">CSV形式で取込</h3>
             <p className="text-xs text-gray-500 mb-3">
               CSVフォーマット: 日付,売上金額,荒利高,客数,備考（1行目にヘッダーがあればスキップされます）
@@ -466,36 +466,36 @@ export default function SalesInputPage() {
 
           {csvPreview.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
                 <h3 className="text-sm font-semibold text-gray-700">
                   取込プレビュー（{csvPreview.length}件）
                 </h3>
                 <button
                   onClick={handleCsvImport}
                   disabled={csvImporting}
-                  className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="w-full sm:w-auto bg-blue-600 text-white rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
                   {csvImporting ? "取込中..." : "一括取込"}
                 </button>
               </div>
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">日付</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">売上金額</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">荒利高</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">客数</th>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">備考</th>
+                    <th className="text-left px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">日付</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">売上金額</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">荒利高</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">客数</th>
+                    <th className="text-left px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">備考</th>
                   </tr>
                 </thead>
                 <tbody>
                   {csvPreview.map((r, i) => (
                     <tr key={i} className="border-t border-gray-50">
-                      <td className="px-4 py-2">{r.date}</td>
-                      <td className="px-4 py-2 text-right">{r.amount.toLocaleString()}円</td>
-                      <td className="px-4 py-2 text-right">{r.grossProfit ? `${r.grossProfit.toLocaleString()}円` : "-"}</td>
-                      <td className="px-4 py-2 text-right">{r.customers || "-"}</td>
-                      <td className="px-4 py-2 text-gray-500">{r.note}</td>
+                      <td className="px-2 sm:px-4 py-1.5 sm:py-2">{r.date}</td>
+                      <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{r.amount.toLocaleString()}円</td>
+                      <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{r.grossProfit ? `${r.grossProfit.toLocaleString()}円` : "-"}</td>
+                      <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{r.customers || "-"}</td>
+                      <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-gray-500">{r.note}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -507,7 +507,7 @@ export default function SalesInputPage() {
       {/* Excel取込 */}
       {tab === "excel" && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">店別月別集計Excel取込</h3>
             <p className="text-xs text-gray-500 mb-3">
               「店別月別_縦」シートから売上・荒利・客数を取り込みます。店コードで店舗をマッピングし、月の1日付けで登録します。
@@ -526,7 +526,6 @@ export default function SalesInputPage() {
                   setExcelFile(f);
                   setExcelPreview([]);
                   setMessage({ type: "success", text: `ファイル「${f.name}」を読み込み中...` });
-                  // クライアント側プレビュー: FormDataでサーバに送る前にSheetJSで表示
                   const reader = new FileReader();
                   reader.onload = (ev) => {
                     import("xlsx").then((XLSX) => {
@@ -568,7 +567,7 @@ export default function SalesInputPage() {
 
           {excelPreview.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
                 <h3 className="text-sm font-semibold text-gray-700">
                   取込プレビュー（{excelPreview.length}件）
                 </h3>
@@ -605,22 +604,22 @@ export default function SalesInputPage() {
                     }
                   }}
                   disabled={excelImporting}
-                  className="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="w-full sm:w-auto bg-blue-600 text-white rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
                   {excelImporting ? "取込中..." : "一括取込"}
                 </button>
               </div>
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">年月</th>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">店コード</th>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">店名</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">売上</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">荒利</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">荒利率</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">客数</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">客単価</th>
+                    <th className="text-left px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">年月</th>
+                    <th className="text-left px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">店コード</th>
+                    <th className="text-left px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">店名</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">売上</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">荒利</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">荒利率</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">客数</th>
+                    <th className="text-right px-2 sm:px-4 py-1.5 sm:py-2 font-medium text-gray-600">客単価</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -631,14 +630,14 @@ export default function SalesInputPage() {
                       ? Math.round(r.salesAmount / r.customerCount) : null;
                     return (
                       <tr key={i} className="border-t border-gray-50">
-                        <td className="px-4 py-2">{r.yearMonth}</td>
-                        <td className="px-4 py-2">{r.storeCode}</td>
-                        <td className="px-4 py-2">{r.storeName}</td>
-                        <td className="px-4 py-2 text-right font-medium">{r.salesAmount.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">{r.grossProfit.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
-                        <td className="px-4 py-2 text-right">{r.customerCount.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">{unitPrice != null ? `${unitPrice.toLocaleString()}円` : "-"}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2">{r.yearMonth}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2">{r.storeCode}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2">{r.storeName}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right font-medium">{r.salesAmount.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{r.grossProfit.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{r.customerCount.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{unitPrice != null ? `${unitPrice.toLocaleString()}円` : "-"}</td>
                       </tr>
                     );
                   })}
@@ -650,12 +649,12 @@ export default function SalesInputPage() {
                     const gpRate = totalSales > 0 ? Math.round((totalGP / totalSales) * 1000) / 10 : null;
                     return (
                       <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold">
-                        <td className="px-4 py-2" colSpan={3}>合計（{excelPreview.length}店舗）</td>
-                        <td className="px-4 py-2 text-right">{totalSales.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">{totalGP.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
-                        <td className="px-4 py-2 text-right">{totalCust.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right">
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2" colSpan={3}>合計（{excelPreview.length}店舗）</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{totalSales.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{totalGP.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{gpRate != null ? `${gpRate}%` : "-"}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">{totalCust.toLocaleString()}</td>
+                        <td className="px-2 sm:px-4 py-1.5 sm:py-2 text-right">
                           {totalCust > 0 ? `${Math.round(totalSales / totalCust).toLocaleString()}円` : "-"}
                         </td>
                       </tr>

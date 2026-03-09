@@ -115,16 +115,16 @@ function KpiCard({
   icon: string;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-5">
       <div className="flex items-center gap-3 mb-3">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${color}`}>
           {icon}
         </div>
-        <span className="text-sm text-gray-500">{title}</span>
+        <span className="text-xs sm:text-sm text-gray-500">{title}</span>
       </div>
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-gray-900">{value}</span>
-        {unit && <span className="text-sm text-gray-500">{unit}</span>}
+        <span className="text-xl sm:text-2xl font-bold text-gray-900">{value}</span>
+        {unit && <span className="text-xs sm:text-sm text-gray-500">{unit}</span>}
       </div>
       {subText && <p className="text-xs text-gray-400 mt-1">{subText}</p>}
     </div>
@@ -261,10 +261,14 @@ function MonthlyTrendChart({
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-5">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">{titles[metric]}</h3>
       {hasData ? (
-        <canvas id={canvasId} className="w-full" style={{ height: 200 }} />
+        <div className="overflow-x-auto">
+          <div className="min-w-[400px]">
+            <canvas id={canvasId} className="w-full" style={{ height: 200 }} />
+          </div>
+        </div>
       ) : (
         <div className="h-[200px] flex items-center justify-center text-gray-400 text-sm">
           データがありません
@@ -286,8 +290,8 @@ function EmploymentTypeBar({ fullTime, partTime }: {
   const ptPct = totalCost > 0 ? (partTime.cost / totalCost) * 100 : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-      <h3 className="text-sm font-semibold text-gray-700 mb-4">雇用形態別人件費内訳</h3>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-5">
+      <h3 className="text-sm font-semibold text-gray-700 mb-2 sm:mb-4">雇用形態別人件費内訳</h3>
       {totalCost > 0 ? (
         <>
           <div className="flex rounded-lg overflow-hidden h-8 mb-3">
@@ -304,7 +308,7 @@ function EmploymentTypeBar({ fullTime, partTime }: {
               {ptPct >= 15 && `${ptPct.toFixed(0)}%`}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded" />
               <span className="text-gray-600">正社員</span>
@@ -388,19 +392,19 @@ export default function LaborAnalysisPage() {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">人件費分析</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">人件費分析</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             人件費率・MH生産性・予算対比を可視化
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {stores.length > 1 && (
             <select
               value={selectedStoreId}
               onChange={(e) => setSelectedStoreId(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
             >
               <option value="">全店舗</option>
               {stores.map((s) => (
@@ -413,7 +417,7 @@ export default function LaborAnalysisPage() {
           <select
             value={yearMonth}
             onChange={(e) => setYearMonth(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-xs sm:text-sm"
           >
             {generateMonthOptions().map((m) => (
               <option key={m.value} value={m.value}>
@@ -435,7 +439,7 @@ export default function LaborAnalysisPage() {
       ) : (
         <>
           {/* KPIカード */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4">
             <KpiCard
               title="人件費合計"
               value={formatCurrency(totals?.totalLaborCost || 0)}
@@ -491,21 +495,21 @@ export default function LaborAnalysisPage() {
           {/* 店舗別比較テーブル */}
           {data.stores.length > 1 && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100">
+              <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100">
                 <h3 className="text-sm font-semibold text-gray-700">店舗別比較</h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-xs sm:text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="text-left px-4 py-3 font-medium text-gray-600">店舗</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">売上</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">人件費</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">人件費率</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">MH生産性</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">投入時間</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">人数</th>
-                      <th className="text-right px-4 py-3 font-medium text-gray-600">予算対比</th>
+                      <th className="text-left px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">店舗</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">売上</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">人件費</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">人件費率</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">MH生産性</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">投入時間</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">人数</th>
+                      <th className="text-right px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-600">予算対比</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -521,10 +525,10 @@ export default function LaborAnalysisPage() {
                           )
                         }
                       >
-                        <td className="px-4 py-3 font-medium text-gray-900">{store.storeName}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(store.totalSales)}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(store.totalLaborCost)}</td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-900">{store.storeName}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{formatCurrency(store.totalSales)}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{formatCurrency(store.totalLaborCost)}</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                           {store.laborCostRatio != null ? (
                             <span className={store.laborCostRatio > 30 ? "text-red-600 font-semibold" : ""}>
                               {store.laborCostRatio}%
@@ -533,12 +537,12 @@ export default function LaborAnalysisPage() {
                             "-"
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                           {store.mhProductivity != null ? `${formatNumber(store.mhProductivity)}円` : "-"}
                         </td>
-                        <td className="px-4 py-3 text-right">{store.totalWorkHours}h</td>
-                        <td className="px-4 py-3 text-right">{store.employeeCount}名</td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{store.totalWorkHours}h</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">{store.employeeCount}名</td>
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                           {store.budgetAchievement != null ? (
                             <span className={store.budgetAchievement > 100 ? "text-red-600 font-semibold" : "text-green-600"}>
                               {store.budgetAchievement}%
@@ -556,7 +560,7 @@ export default function LaborAnalysisPage() {
           )}
 
           {/* 月別推移チャート */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
             <MonthlyTrendChart data={monthlyTrendData} metric="laborCost" />
             <MonthlyTrendChart data={monthlyTrendData} metric="sales" />
             <MonthlyTrendChart data={monthlyTrendData} metric="grossProfit" />
@@ -590,11 +594,11 @@ export default function LaborAnalysisPage() {
 
           {/* 売上データ未登録の案内 */}
           {totals && totals.totalSales === 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-5">
               <h3 className="text-sm font-semibold text-amber-800 mb-2">
                 売上データが未登録です
               </h3>
-              <p className="text-sm text-amber-700">
+              <p className="text-xs sm:text-sm text-amber-700">
                 人件費率やMH生産性を算出するには、日別売上データの登録が必要です。
                 「売上入力」メニューから手入力またはCSV取込で登録してください。
               </p>

@@ -109,10 +109,10 @@ export default function AttendanceRecordsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">勤怠実績一覧</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">勤怠実績一覧</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             全従業員の勤怠記録
             {pagination && ` | ${pagination.total.toLocaleString()}件中 ${((page - 1) * PAGE_SIZE + 1).toLocaleString()}〜${Math.min(page * PAGE_SIZE, pagination.total).toLocaleString()}件`}
           </p>
@@ -120,48 +120,48 @@ export default function AttendanceRecordsPage() {
       </div>
 
       {/* フィルター */}
-      <div className="flex items-center gap-4 mb-4">
-        <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4">
+        <div className="w-full sm:w-auto">
           <label className="text-xs text-gray-500">開始日</label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => handleDateChange("start", e.target.value)}
-            className="block border rounded-lg px-3 py-1.5 text-sm"
+            className="block w-full sm:w-auto border rounded-lg px-3 py-1.5 text-xs sm:text-sm"
           />
         </div>
-        <div>
+        <div className="w-full sm:w-auto">
           <label className="text-xs text-gray-500">終了日</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => handleDateChange("end", e.target.value)}
-            className="block border rounded-lg px-3 py-1.5 text-sm"
+            className="block w-full sm:w-auto border rounded-lg px-3 py-1.5 text-xs sm:text-sm"
           />
         </div>
       </div>
 
       {/* サマリーカード */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
-        <div className="bg-white rounded-xl border p-4">
-          <div className="text-xs text-gray-500">総勤務時間（このページ）</div>
-          <div className="text-xl font-bold text-gray-800 mt-1">{formatMinutes(totalWorkMinutes)}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-6">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
+          <div className="text-xs text-gray-500">総勤務時間</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-800 mt-1">{formatMinutes(totalWorkMinutes)}</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">総残業時間</div>
-          <div className="text-xl font-bold text-orange-600 mt-1">{formatMinutes(totalOvertimeMinutes)}</div>
+          <div className="text-lg sm:text-xl font-bold text-orange-600 mt-1">{formatMinutes(totalOvertimeMinutes)}</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">遅刻回数</div>
-          <div className="text-xl font-bold text-yellow-600 mt-1">{lateDays}回</div>
+          <div className="text-lg sm:text-xl font-bold text-yellow-600 mt-1">{lateDays}回</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">欠勤回数</div>
-          <div className="text-xl font-bold text-red-600 mt-1">{absentDays}回</div>
+          <div className="text-lg sm:text-xl font-bold text-red-600 mt-1">{absentDays}回</div>
         </div>
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-white rounded-xl border p-2 sm:p-3 lg:p-4">
           <div className="text-xs text-gray-500">総人件費</div>
-          <div className="text-xl font-bold text-gray-800 mt-1">¥{totalLaborCost.toLocaleString()}</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-800 mt-1">¥{totalLaborCost.toLocaleString()}</div>
         </div>
       </div>
 
@@ -176,18 +176,18 @@ export default function AttendanceRecordsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="bg-slate-50">
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">日付</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">従業員</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">出勤</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">退勤</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">勤務時間</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">残業</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">遅刻(分)</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">ステータス</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">人件費</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">日付</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">従業員</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">出勤</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">退勤</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">勤務時間</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">残業</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">遅刻(分)</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">ステータス</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">人件費</th>
               </tr>
             </thead>
             <tbody>
@@ -195,32 +195,32 @@ export default function AttendanceRecordsPage() {
                 const statusInfo = STATUS_LABELS[rec.status] || { label: rec.status, color: "" };
                 return (
                   <tr key={rec.id} className="hover:bg-gray-50">
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {new Date(rec.attendanceDate).toLocaleDateString("ja-JP")}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className="font-medium">{rec.employee.lastName} {rec.employee.firstName}</span>
                       <span className="text-xs text-gray-400 ml-2">{rec.employee.code}</span>
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {rec.clockIn ? new Date(rec.clockIn).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {rec.clockOut ? new Date(rec.clockOut).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">{formatMinutes(rec.totalWorkMinutes)}</td>
-                    <td className="p-3 text-sm border-b text-right text-orange-600">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">{formatMinutes(rec.totalWorkMinutes)}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right text-orange-600">
                       {rec.overtimeMinutes > 0 ? formatMinutes(rec.overtimeMinutes) : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {rec.lateMinutes > 0 ? <span className="text-yellow-600">{rec.lateMinutes}</span> : "−"}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusInfo.color}`}>
                         {statusInfo.label}
                       </span>
                     </td>
-                    <td className="p-3 text-sm border-b text-right">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">
                       {rec.laborCost ? `¥${rec.laborCost.toLocaleString()}` : "−"}
                     </td>
                   </tr>
@@ -230,17 +230,17 @@ export default function AttendanceRecordsPage() {
           </table>
 
           {/* ページネーション */}
-          <div className="p-3 bg-slate-50 border-t flex items-center justify-between">
+          <div className="px-2 sm:px-3 py-2 bg-slate-50 border-t flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
             <span className="text-xs text-gray-600">
               全{pagination?.total.toLocaleString() || records.length}件
               {pagination && pagination.totalPages > 1 && ` | ページ ${page} / ${pagination.totalPages}`}
             </span>
             {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   前へ
                 </button>
@@ -260,7 +260,7 @@ export default function AttendanceRecordsPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className={`px-3 py-1 text-sm border rounded-lg ${
+                      className={`px-2 sm:px-3 py-1 text-xs sm:text-sm border rounded-lg ${
                         page === p ? "bg-blue-600 text-white border-blue-600" : "hover:bg-gray-100"
                       }`}
                     >
@@ -271,7 +271,7 @@ export default function AttendanceRecordsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                   disabled={page >= pagination.totalPages}
-                  className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   次へ
                 </button>

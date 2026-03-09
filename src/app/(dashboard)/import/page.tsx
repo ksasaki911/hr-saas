@@ -86,7 +86,7 @@ const EMPLOYEE_AUTO_MAP: { systemField: string; patterns: string[] }[] = [
   { systemField: "storeCode", patterns: ["拠点コード", "所属コード", "店舗コード"] },
   { systemField: "departmentName", patterns: ["部門", "部門名"] },
   { systemField: "departmentCode", patterns: ["部門コード", "部署コード"] },
-  { systemField: "employmentType", patterns: ["雇用区分コード", "雇用区分", "雇用形態"] },
+  { systemField: "employmentType", patterns: ["雇用区分コード", "雇用区分", "給与体系コード", "給与体系", "パート区分コード", "パート区分", "雇用形態", "勤務形態", "従業員区分"] },
   { systemField: "positionName", patterns: ["役職", "職位"] },
   { systemField: "hireDate", patterns: ["入社日", "入社年月日"] },
   { systemField: "hourlyWage", patterns: ["時給"] },
@@ -503,34 +503,34 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">CSVインポート</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">CSVインポート</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             タッチオンタイム等の勤怠システムからCSVデータを取り込みます
           </p>
         </div>
         {step !== "select" && (
-          <button onClick={handleReset} className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          <button onClick={handleReset} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
             最初からやり直す
           </button>
         )}
       </div>
 
       {/* ステップインジケーター */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1 sm:gap-2">
         {[
           { key: "select", label: "1. ファイル選択" },
           { key: "mapping", label: "2. カラム設定" },
           { key: "preview", label: "3. プレビュー" },
           { key: "result", label: "4. 結果" },
         ].map((s, i) => (
-          <div key={s.key} className="flex items-center gap-2">
-            {i > 0 && <div className="w-8 h-px bg-gray-300" />}
+          <div key={s.key} className="flex items-center gap-1 sm:gap-2">
+            {i > 0 && <div className="w-4 sm:w-8 h-px bg-gray-300" />}
             <div
-              className={`px-3 py-1.5 rounded-full text-xs font-medium ${
+              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium ${
                 step === s.key
                   ? "bg-blue-600 text-white"
                   : ["select", "mapping", "preview", "result"].indexOf(step) >
@@ -554,22 +554,22 @@ export default function ImportPage() {
 
       {/* ステップ1: ファイル選択 */}
       {step === "select" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 space-y-4 sm:space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">インポートの種類</label>
-            <div className="grid grid-cols-2 gap-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">インポートの種類</label>
+            <div className="grid grid-cols-2 gap-2 sm:gap-4">
               <button
                 onClick={() => setImportType("employees")}
-                className={`p-4 rounded-lg border-2 text-left transition-all ${importType === "employees" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 sm:p-4 rounded-lg border-2 text-left transition-all ${importType === "employees" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
               >
-                <div className="text-lg mb-1">👥 従業員マスタ</div>
+                <div className="text-base sm:text-lg mb-1">👥 従業員マスタ</div>
                 <div className="text-xs text-gray-500">従業員コード、氏名、所属、雇用区分などの基本情報を取り込みます</div>
               </button>
               <button
                 onClick={() => setImportType("attendance")}
-                className={`p-4 rounded-lg border-2 text-left transition-all ${importType === "attendance" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 sm:p-4 rounded-lg border-2 text-left transition-all ${importType === "attendance" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
               >
-                <div className="text-lg mb-1">⏱️ 勤怠実績</div>
+                <div className="text-base sm:text-lg mb-1">⏱️ 勤怠実績</div>
                 <div className="text-xs text-gray-500">出退勤時刻、残業、遅刻、早退などの勤怠データを取り込みます</div>
               </button>
             </div>
@@ -577,11 +577,11 @@ export default function ImportPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">CSVファイル</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center hover:border-blue-400 transition-colors">
               <input type="file" accept=".csv,.txt" onChange={handleFileSelect} className="hidden" id="csv-file" />
               <label htmlFor="csv-file" className="cursor-pointer">
-                <div className="text-4xl mb-3">📄</div>
-                <div className="text-sm text-gray-600">
+                <div className="text-2xl sm:text-4xl mb-2 sm:mb-3">📄</div>
+                <div className="text-xs sm:text-sm text-gray-600">
                   {file ? (
                     <span className="text-blue-600 font-medium">{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
                   ) : (
@@ -592,8 +592,8 @@ export default function ImportPage() {
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="font-medium text-amber-800 text-sm mb-2">タッチオンタイムからのエクスポート方法</div>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
+            <div className="font-medium text-amber-800 text-xs sm:text-sm mb-1 sm:mb-2">タッチオンタイムからのエクスポート方法</div>
             <div className="text-xs text-amber-700 space-y-1">
               {importType === "employees" ? (
                 <>
@@ -612,7 +612,7 @@ export default function ImportPage() {
           <button
             onClick={handleUploadPreview}
             disabled={!file || loading}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? loadingMsg || "解析中..." : "CSVを解析する"}
           </button>
@@ -621,22 +621,22 @@ export default function ImportPage() {
 
       {/* ステップ2: カラムマッピング */}
       {step === "mapping" && previewData && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-lg font-semibold">カラムマッピング設定</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-sm sm:text-lg font-semibold">カラムマッピング設定</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
               {previewData.totalRows}件 | ヘッダー: {previewData.headers.length}列
             </p>
           </div>
 
           {/* マッピング済みカラム一覧（186列を全部表示すると見づらいので、マッピング対象のみ） */}
-          <div className="bg-gray-50 rounded-lg p-3">
+          <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
             <div className="text-xs font-medium text-gray-500 mb-2">
               自動検出されたカラム（{Object.values(mapping).filter(Boolean).length}列マッチ / {previewData.headers.length}列中）
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {Object.entries(mapping).filter(([, v]) => v).map(([sys, col]) => (
-                <span key={sys} className="px-2 py-1 bg-green-100 text-green-700 rounded border border-green-200 text-xs">
+                <span key={sys} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-700 rounded border border-green-200 text-xs">
                   {fields.find(f => f.systemField === sys)?.label.replace(" *", "") || sys} → {col}
                 </span>
               ))}
@@ -644,22 +644,22 @@ export default function ImportPage() {
           </div>
 
           <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-500 px-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs font-semibold text-gray-500 px-2">
               <div>システム項目</div>
               <div>CSV列名（対応付け）</div>
             </div>
             {fields.map((f) => (
               <div
                 key={f.systemField}
-                className={`grid grid-cols-2 gap-4 items-center p-2 rounded ${
+                className={`grid grid-cols-2 gap-2 sm:gap-4 items-center p-2 rounded ${
                   mapping[f.systemField] ? "bg-green-50" : f.label.includes("*") ? "bg-red-50" : "bg-gray-50"
                 }`}
               >
-                <div className="text-sm">{f.label}</div>
+                <div className="text-xs sm:text-sm">{f.label}</div>
                 <select
                   value={mapping[f.systemField] || ""}
                   onChange={(e) => handleMappingChange(f.systemField, e.target.value)}
-                  className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                  className="w-full px-1.5 sm:px-2 py-1 sm:py-1.5 border border-gray-300 rounded text-xs sm:text-sm"
                 >
                   <option value="">（未設定）</option>
                   {previewData.headers.map((h) => (
@@ -672,11 +672,11 @@ export default function ImportPage() {
 
           {stores.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">デフォルト店舗（所属が不明な場合に使用）</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">デフォルト店舗（所属が不明な場合に使用）</label>
               <select
                 value={selectedStoreId}
                 onChange={(e) => setSelectedStoreId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm"
               >
                 <option value="">自動（最初の店舗）</option>
                 {stores.map((s) => (
@@ -686,14 +686,14 @@ export default function ImportPage() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button onClick={() => setStep("select")} className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+          <div className="flex gap-2 sm:gap-3">
+            <button onClick={() => setStep("select")} className="px-3 sm:px-6 py-2 sm:py-2.5 border border-gray-300 rounded-lg text-xs sm:text-sm hover:bg-gray-50">
               戻る
             </button>
             <button
               onClick={handleApplyMapping}
               disabled={loading}
-              className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
             >
               マッピングを適用してプレビュー
             </button>
@@ -703,31 +703,31 @@ export default function ImportPage() {
 
       {/* ステップ3: プレビュー */}
       {step === "preview" && previewData && (
-        <div className="space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">バリデーション結果</h2>
-            <div className="grid grid-cols-4 gap-4 mb-4">
-              <div className="bg-blue-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-blue-700">{previewData.validation.stats.totalRows}</div>
+        <div className="space-y-3 sm:space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+            <h2 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-4">バリデーション結果</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-4">
+              <div className="bg-blue-50 rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl font-bold text-blue-700">{previewData.validation.stats.totalRows}</div>
                 <div className="text-xs text-blue-600">総行数</div>
               </div>
-              <div className="bg-green-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-green-700">{previewData.validation.stats.validRows}</div>
+              <div className="bg-green-50 rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl font-bold text-green-700">{previewData.validation.stats.validRows}</div>
                 <div className="text-xs text-green-600">正常</div>
               </div>
-              <div className="bg-red-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-red-700">{previewData.validation.stats.errorRows}</div>
+              <div className="bg-red-50 rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl font-bold text-red-700">{previewData.validation.stats.errorRows}</div>
                 <div className="text-xs text-red-600">エラー</div>
               </div>
-              <div className="bg-amber-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-amber-700">{previewData.validation.stats.warningRows}</div>
+              <div className="bg-amber-50 rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl font-bold text-amber-700">{previewData.validation.stats.warningRows}</div>
                 <div className="text-xs text-amber-600">警告</div>
               </div>
             </div>
 
             {previewData.validation.errors.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
-                <div className="font-medium text-red-800 text-sm mb-1">エラー</div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-2 sm:p-3 mb-2 sm:mb-3">
+                <div className="font-medium text-red-800 text-xs sm:text-sm mb-1">エラー</div>
                 <div className="text-xs text-red-700 space-y-0.5 max-h-40 overflow-y-auto">
                   {previewData.validation.errors.map((e, i) => <div key={i}>{e}</div>)}
                 </div>
@@ -735,17 +735,17 @@ export default function ImportPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+            <h2 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-4">
               データプレビュー（先頭{previewData.preview.length}件）
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs sm:text-xs">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-2 py-2 text-left font-medium text-gray-500">#</th>
+                    <th className="px-1.5 sm:px-2 py-1 sm:py-2 text-left font-medium text-gray-500">#</th>
                     {fields.filter(f => mapping[f.systemField]).map(f => (
-                      <th key={f.systemField} className="px-2 py-2 text-left font-medium text-gray-500 whitespace-nowrap">
+                      <th key={f.systemField} className="px-1.5 sm:px-2 py-1 sm:py-2 text-left font-medium text-gray-500 whitespace-nowrap">
                         {f.label.replace(" *", "")}
                       </th>
                     ))}
@@ -754,9 +754,9 @@ export default function ImportPage() {
                 <tbody>
                   {previewData.preview.map((row, i) => (
                     <tr key={i} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-2 py-1.5 text-gray-400">{i + 1}</td>
+                      <td className="px-1.5 sm:px-2 py-1 sm:py-1.5 text-gray-400">{i + 1}</td>
                       {fields.filter(f => mapping[f.systemField]).map(f => (
-                        <td key={f.systemField} className="px-2 py-1.5 whitespace-nowrap">
+                        <td key={f.systemField} className="px-1.5 sm:px-2 py-1 sm:py-1.5 whitespace-nowrap">
                           {row[f.systemField] || <span className="text-gray-300">-</span>}
                         </td>
                       ))}
@@ -769,15 +769,15 @@ export default function ImportPage() {
 
           {/* インポート進行中の表示 */}
           {loading && importProgress && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 space-y-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-5 space-y-2 sm:space-y-3">
               <div className="flex items-center justify-between">
-                <div className="font-semibold text-blue-800">インポート実行中...</div>
-                <div className="text-sm text-blue-600 font-mono">{importProgress.pct}%</div>
+                <div className="font-semibold text-xs sm:text-sm text-blue-800">インポート実行中...</div>
+                <div className="text-xs sm:text-sm text-blue-600 font-mono">{importProgress.pct}%</div>
               </div>
               {/* プログレスバー */}
-              <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-blue-200 rounded-full h-2 sm:h-3 overflow-hidden">
                 <div
-                  className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                  className="bg-blue-600 h-2 sm:h-3 rounded-full transition-all duration-500"
                   style={{ width: `${Math.max(importProgress.pct, 2)}%` }}
                 />
               </div>
@@ -785,7 +785,7 @@ export default function ImportPage() {
                 <span>バッチ {importProgress.batch}/{importProgress.totalBatches}</span>
                 <span>{importProgress.processed.toLocaleString()} / {importProgress.total.toLocaleString()} 件</span>
               </div>
-              <div className="text-center text-sm text-blue-700 font-mono tabular-nums">
+              <div className="text-center text-xs sm:text-sm text-blue-700 font-mono tabular-nums">
                 経過 {Math.floor(elapsedSec / 60)}:{String(elapsedSec % 60).padStart(2, "0")}
                 {importProgress.batch > 1 && (() => {
                   const secPerBatch = elapsedSec / (importProgress.batch - 1);
@@ -796,15 +796,15 @@ export default function ImportPage() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button onClick={() => setStep("mapping")} disabled={loading} className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50">
+          <div className="flex gap-2 sm:gap-3">
+            <button onClick={() => setStep("mapping")} disabled={loading} className="px-3 sm:px-6 py-2 sm:py-2.5 border border-gray-300 rounded-lg text-xs sm:text-sm hover:bg-gray-50 disabled:opacity-50">
               マッピングを修正
             </button>
             {!loading && (
               <button
                 onClick={handleImport}
                 disabled={!previewData.validation.valid}
-                className={`flex-1 py-2.5 rounded-lg font-medium text-white ${previewData.validation.valid ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"} disabled:opacity-50`}
+                className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm rounded-lg font-medium text-white ${previewData.validation.valid ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"} disabled:opacity-50`}
               >
                 {previewData.validation.valid ? `${previewData.validation.stats.validRows}件をインポート実行` : "エラーを修正してください"}
               </button>
@@ -815,44 +815,44 @@ export default function ImportPage() {
 
       {/* ステップ4: 結果 */}
       {step === "result" && importResult && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 space-y-4 sm:space-y-6">
           <div className="text-center">
-            <div className="text-5xl mb-4">{importResult.errors.length === 0 ? "✅" : "⚠️"}</div>
-            <h2 className="text-xl font-bold text-gray-900">
+            <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">{importResult.errors.length === 0 ? "✅" : "⚠️"}</div>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
               インポート{importResult.errors.length === 0 ? "完了" : "完了（一部エラーあり）"}
             </h2>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-blue-700">{importResult.total}</div>
-              <div className="text-sm text-blue-600">総件数</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+            <div className="bg-blue-50 rounded-lg p-2 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-700">{importResult.total}</div>
+              <div className="text-xs sm:text-sm text-blue-600">総件数</div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{importResult.created}</div>
-              <div className="text-sm text-green-600">新規登録</div>
+            <div className="bg-green-50 rounded-lg p-2 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{importResult.created}</div>
+              <div className="text-xs sm:text-sm text-green-600">新規登録</div>
             </div>
-            <div className="bg-yellow-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-yellow-700">{importResult.updated}</div>
-              <div className="text-sm text-yellow-600">更新</div>
+            <div className="bg-yellow-50 rounded-lg p-2 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-yellow-700">{importResult.updated}</div>
+              <div className="text-xs sm:text-sm text-yellow-600">更新</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-gray-700">{importResult.skipped}</div>
-              <div className="text-sm text-gray-600">スキップ</div>
+            <div className="bg-gray-50 rounded-lg p-2 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-700">{importResult.skipped}</div>
+              <div className="text-xs sm:text-sm text-gray-600">スキップ</div>
             </div>
           </div>
 
           {importResult.storesCreated && importResult.storesCreated > 0 && (
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-              <div className="text-sm text-purple-800">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 sm:p-3">
+              <div className="text-xs sm:text-sm text-purple-800">
                 拠点マスタを <span className="font-bold">{importResult.storesCreated}件</span> 自動作成しました
               </div>
             </div>
           )}
 
           {importResult.errors.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="font-medium text-red-800 text-sm mb-2">エラー詳細</div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+              <div className="font-medium text-red-800 text-xs sm:text-sm mb-1 sm:mb-2">エラー詳細</div>
               <div className="text-xs text-red-700 space-y-1 max-h-40 overflow-y-auto">
                 {importResult.errors.slice(0, 50).map((e, i) => <div key={i}>{e}</div>)}
                 {importResult.errors.length > 50 && <div>...他 {importResult.errors.length - 50} 件</div>}
@@ -860,13 +860,13 @@ export default function ImportPage() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button onClick={handleReset} className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button onClick={handleReset} className="flex-1 py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
               別のファイルをインポート
             </button>
             <a
               href={importType === "employees" ? "/employees" : "/attendance/records"}
-              className="flex-1 py-2.5 border border-gray-300 rounded-lg font-medium text-center hover:bg-gray-50"
+              className="flex-1 py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm border border-gray-300 rounded-lg font-medium text-center hover:bg-gray-50"
             >
               {importType === "employees" ? "従業員一覧を確認" : "勤怠実績を確認"}
             </a>

@@ -126,14 +126,14 @@ export default function LeaveRequestsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">休暇管理</h2>
-          <p className="text-sm text-gray-500 mt-1">休暇申請の管理と承認</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">休暇管理</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">休暇申請の管理と承認</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+          className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition-colors"
         >
           {showForm ? "閉じる" : "+ 休暇申請"}
         </button>
@@ -141,15 +141,15 @@ export default function LeaveRequestsPage() {
 
       {/* 申請フォーム */}
       {showForm && (
-        <div className="bg-white rounded-xl border p-6 mb-6">
-          <h3 className="font-medium text-gray-700 mb-4">新規休暇申請</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border p-3 sm:p-6 mb-6">
+          <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-2 sm:mb-4">新規休暇申請</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <div>
               <label className="block text-xs text-gray-500 mb-1">従業員</label>
               <select
                 value={formData.employeeId}
                 onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               >
                 <option value="">-- 選択 --</option>
                 {employees.map((emp) => (
@@ -164,7 +164,7 @@ export default function LeaveRequestsPage() {
               <select
                 value={formData.leaveType}
                 onChange={(e) => setFormData({ ...formData, leaveType: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               >
                 {Object.entries(TYPE_LABELS).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
@@ -177,7 +177,7 @@ export default function LeaveRequestsPage() {
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
             <div>
@@ -186,25 +186,25 @@ export default function LeaveRequestsPage() {
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-xs text-gray-500 mb-1">理由</label>
               <input
                 type="text"
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="任意"
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-xs sm:text-sm"
               />
             </div>
           </div>
-          <div className="mt-4 flex justify-end">
+          <div className="mt-2 sm:mt-4 flex justify-end">
             <button
               onClick={handleSubmit}
               disabled={processing || !formData.employeeId || !formData.startDate || !formData.endDate}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {processing ? "送信中..." : "申請する"}
             </button>
@@ -213,8 +213,8 @@ export default function LeaveRequestsPage() {
       )}
 
       {/* フィルター */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm text-gray-500">ステータス:</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
+        <span className="text-xs sm:text-sm text-gray-500">ステータス:</span>
         {[
           { value: "", label: "すべて" },
           { value: "PENDING", label: "申請中" },
@@ -246,17 +246,17 @@ export default function LeaveRequestsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="bg-slate-50">
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">申請日</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">従業員</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">種別</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">期間</th>
-                <th className="text-right p-3 text-sm font-medium text-gray-600 border-b">日数</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">理由</th>
-                <th className="text-left p-3 text-sm font-medium text-gray-600 border-b">ステータス</th>
-                <th className="text-center p-3 text-sm font-medium text-gray-600 border-b">操作</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">申請日</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">従業員</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">種別</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">期間</th>
+                <th className="text-right px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">日数</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">理由</th>
+                <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">ステータス</th>
+                <th className="text-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-600 border-b">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -264,37 +264,37 @@ export default function LeaveRequestsPage() {
                 const statusInfo = STATUS_LABELS[req.status] || { label: req.status, color: "" };
                 return (
                   <tr key={req.id} className="hover:bg-gray-50">
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {new Date(req.createdAt).toLocaleDateString("ja-JP")}
                     </td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className="font-medium">{req.employee.lastName} {req.employee.firstName}</span>
                       <span className="text-xs text-gray-400 ml-2">{req.employee.code}</span>
                     </td>
-                    <td className="p-3 text-sm border-b">{TYPE_LABELS[req.leaveType] || req.leaveType}</td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">{TYPE_LABELS[req.leaveType] || req.leaveType}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       {new Date(req.startDate).toLocaleDateString("ja-JP")}
                       {req.startDate !== req.endDate && ` 〜 ${new Date(req.endDate).toLocaleDateString("ja-JP")}`}
                     </td>
-                    <td className="p-3 text-sm border-b text-right">{req.totalDays}日</td>
-                    <td className="p-3 text-sm border-b text-gray-500">{req.reason || "−"}</td>
-                    <td className="p-3 text-sm border-b">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-right">{req.totalDays}日</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-gray-500">{req.reason || "−"}</td>
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusInfo.color}`}>
                         {statusInfo.label}
                       </span>
                     </td>
-                    <td className="p-3 text-sm border-b text-center">
+                    <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border-b text-center">
                       {req.status === "PENDING" ? (
-                        <div className="flex gap-1 justify-center">
+                        <div className="flex gap-0.5 sm:gap-1 justify-center">
                           <button
                             onClick={() => handleAction(req.id, "APPROVED")}
-                            className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                            className="px-1.5 sm:px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                           >
                             承認
                           </button>
                           <button
                             onClick={() => handleAction(req.id, "REJECTED")}
-                            className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                            className="px-1.5 sm:px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
                           >
                             却下
                           </button>
@@ -308,7 +308,7 @@ export default function LeaveRequestsPage() {
               })}
             </tbody>
           </table>
-          <div className="p-3 bg-slate-50 border-t text-xs text-gray-600">
+          <div className="px-2 sm:px-3 py-2 bg-slate-50 border-t text-xs text-gray-600">
             合計: {requests.length}件
             {requests.filter((r) => r.status === "PENDING").length > 0 && (
               <span className="ml-2 text-yellow-600">
