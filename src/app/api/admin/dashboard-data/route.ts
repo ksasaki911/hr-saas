@@ -1,12 +1,21 @@
-// ダッシュボード用データ集計API
+// ダッシュボード用データ集計API（パフォーマンス最適化版）
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getTenantDb } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 
 export const maxDuration = 120;
 
+// インメモリキャッシュ（5分TTL）
+let cache: { data: any; timestamp: number } | null = null;
+const CACHE_TTL = 5 * 60 * 1000; // 5分
+
 export async function GET() {
   try {
+    // キャッシュチェック
+    if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
+      return NextResponse.json(cache.data);
+    }
+
     const { db } = await getTenantDb();
 
     // 店舗一覧
@@ -26,8 +35,14 @@ export async function GET() {
       },
     });
 
-    // 勤怠レコード全件（集計用フィールドのみ）
+    // 過去13ヶ月分のみ取得（全件ではなく期間指定）
+    const now = new Date();
+    const thirteenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 13, 1);
+
     const records = await db.attendanceRecord.findMany({
+      where: {
+        attendanceDate: { gte: thirteenMonthsAgo },
+      },
       select: {
         storeId: true,
         employeeId: true,
@@ -35,9 +50,7 @@ export async function GET() {
         totalWorkMinutes: true,
         overtimeMinutes: true,
         lateMinutes: true,
-        earlyLeaveMinutes: true,
         laborCost: true,
-        status: true,
       },
     });
 
@@ -59,9 +72,7 @@ export async function GET() {
     const localDateStr = (d: Date) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-    // ===== 集計 =====
-
-    // 月別集計
+    // ===== 1パスで月別＆曜日別を同時集計 =====
     type MonthRow = {
       month: string;
       storeId: string;
@@ -73,33 +84,43 @@ export async function GET() {
       uniqueEmployees: Set<string>;
     };
     const monthlyMap = new Map<string, MonthRow>();
+    const dowMap = new Map<string, { dow: number; storeId: string; workMinutes: number; count: number }>();
 
     for (const r of records) {
-      const dStr = localDateStr(new Date(r.attendanceDate));
+      const d = new Date(r.attendanceDate);
+      const dStr = localDateStr(d);
       const month = dStr.substring(0, 7);
-      const key = `${month}|${r.storeId}`;
 
-      if (!monthlyMap.has(key)) {
-        monthlyMap.set(key, {
-          month,
-          storeId: r.storeId,
-          workMinutes: 0,
-          overtimeMinutes: 0,
-          laborCost: 0,
-          attendanceDays: 0,
-          lateDays: 0,
-          uniqueEmployees: new Set(),
+      // 月別集計
+      const mKey = `${month}|${r.storeId}`;
+      if (!monthlyMap.has(mKey)) {
+        monthlyMap.set(mKey, {
+          month, storeId: r.storeId,
+          workMinutes: 0, overtimeMinutes: 0, laborCost: 0,
+          attendanceDays: 0, lateDays: 0, uniqueEmployees: new Set(),
         });
       }
-      const row = monthlyMap.get(key)!;
-      row.workMinutes += r.totalWorkMinutes || 0;
-      row.overtimeMinutes += r.overtimeMinutes || 0;
-      row.laborCost += r.laborCost || 0;
+      const mRow = monthlyMap.get(mKey)!;
+      mRow.workMinutes += r.totalWorkMinutes || 0;
+      mRow.overtimeMinutes += r.overtimeMinutes || 0;
+      mRow.laborCost += r.laborCost || 0;
       if (r.totalWorkMinutes > 0) {
-        row.attendanceDays++;
-        row.uniqueEmployees.add(r.employeeId);
+        mRow.attendanceDays++;
+        mRow.uniqueEmployees.add(r.employeeId);
       }
-      if (r.lateMinutes > 0) row.lateDays++;
+      if (r.lateMinutes > 0) mRow.lateDays++;
+
+      // 曜日別集計（同じループ内で処理）
+      if (r.totalWorkMinutes > 0) {
+        const dow = d.getDay();
+        const dKey = `${dow}|${r.storeId}`;
+        if (!dowMap.has(dKey)) {
+          dowMap.set(dKey, { dow, storeId: r.storeId, workMinutes: 0, count: 0 });
+        }
+        const dRow = dowMap.get(dKey)!;
+        dRow.workMinutes += r.totalWorkMinutes;
+        dRow.count++;
+      }
     }
 
     const monthly = Array.from(monthlyMap.values()).map(r => ({
@@ -113,19 +134,6 @@ export async function GET() {
       uniqueEmployees: r.uniqueEmployees.size,
     }));
 
-    // 曜日別集計
-    const dowMap = new Map<string, { dow: number; storeId: string; workMinutes: number; count: number }>();
-    for (const r of records) {
-      if (r.totalWorkMinutes <= 0) continue;
-      const dow = new Date(r.attendanceDate).getDay();
-      const key = `${dow}|${r.storeId}`;
-      if (!dowMap.has(key)) {
-        dowMap.set(key, { dow, storeId: r.storeId, workMinutes: 0, count: 0 });
-      }
-      const row = dowMap.get(key)!;
-      row.workMinutes += r.totalWorkMinutes;
-      row.count++;
-    }
     const byDow = Array.from(dowMap.values()).map(r => ({
       dow: r.dow,
       storeId: r.storeId,
@@ -133,22 +141,35 @@ export async function GET() {
       totalDays: r.count,
     }));
 
-    // 店舗別従業員構成
+    // 店舗別従業員構成（事前にstoreIdでグループ化）
     type EmpRow = { storeId: string; isActive: boolean; employmentType: string; id: string; hourlyWage: number | null };
-    const storeEmpBreakdown = stores.map((s: { id: string; name: string; code: string }) => {
-      const storeEmps = (employees as EmpRow[]).filter((e) => e.storeId === s.id && e.isActive);
-      return {
-        storeId: s.id,
-        storeName: s.name,
-        fullTime: storeEmps.filter((e) => e.employmentType === "FULL_TIME").length,
-        partTime: storeEmps.filter((e) => e.employmentType === "PART_TIME").length,
-        arbeit: storeEmps.filter((e) => e.employmentType === "ARBEIT").length,
-        contract: storeEmps.filter((e) => e.employmentType === "CONTRACT").length,
-        total: storeEmps.length,
-      };
-    }).filter((s: any) => s.total > 0);
+    const storeEmpMap = new Map<string, EmpRow[]>();
+    for (const e of employees as EmpRow[]) {
+      if (!e.isActive) continue;
+      if (!storeEmpMap.has(e.storeId)) storeEmpMap.set(e.storeId, []);
+      storeEmpMap.get(e.storeId)!.push(e);
+    }
 
-    return NextResponse.json({
+    const storeEmpBreakdown = stores
+      .map((s: { id: string; name: string; code: string }) => {
+        const storeEmps = storeEmpMap.get(s.id) || [];
+        if (storeEmps.length === 0) return null;
+        let ft = 0, pt = 0, ab = 0, ct = 0;
+        for (const e of storeEmps) {
+          if (e.employmentType === "FULL_TIME") ft++;
+          else if (e.employmentType === "PART_TIME") pt++;
+          else if (e.employmentType === "ARBEIT") ab++;
+          else if (e.employmentType === "CONTRACT") ct++;
+        }
+        return {
+          storeId: s.id, storeName: s.name,
+          fullTime: ft, partTime: pt, arbeit: ab, contract: ct,
+          total: storeEmps.length,
+        };
+      })
+      .filter(Boolean);
+
+    const result = {
       stores: stores.map((s: any) => ({ id: s.id, name: s.name, code: s.code })),
       summary: {
         totalEmployees: (employees as any[]).filter((e: any) => e.isActive).length,
@@ -162,7 +183,12 @@ export async function GET() {
       monthly,
       byDow,
       storeEmpBreakdown,
-    });
+    };
+
+    // キャッシュに保存
+    cache = { data: result, timestamp: Date.now() };
+
+    return NextResponse.json(result);
   } catch (e) {
     console.error("dashboard-data error:", e);
     return NextResponse.json({ error: String(e) }, { status: 500 });

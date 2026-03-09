@@ -365,6 +365,8 @@ model AttendanceRecord {
   @@unique([tenantId, employeeId, attendanceDate])
   @@index([tenantId, storeId, attendanceDate])
   @@index([tenantId, employeeId, attendanceDate])
+  @@index([tenantId, attendanceDate])
+  @@index([storeId, attendanceDate])
   @@map("attendance_records")
 }
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 // =============================================================
-// 店舗長ダッシュボードAPI
+// 店舗長ダッシュボードAPI（パフォーマンス最適化版）
 // GET /api/admin/store-dashboard?storeId=xxx
 // 店舗単位の勤怠・人時・人件費データを返す
 // =============================================================
@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantDb } from "@/lib/tenant";
 
 export const maxDuration = 120;
+
+// インメモリキャッシュ（3分TTL、storeId+month+weekごと）
+const storeCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 3 * 60 * 1000;
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,6 +21,15 @@ export async function GET(req: NextRequest) {
 
     if (!storeId) {
       return NextResponse.json({ error: "storeIdが必要です" }, { status: 400 });
+    }
+
+    // キャッシュチェック
+    const monthParam = url.searchParams.get("month");
+    const weekParam = url.searchParams.get("weekStart");
+    const cacheKey = `${storeId}|${monthParam || ""}|${weekParam || ""}`;
+    const cached = storeCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return NextResponse.json(cached.data);
     }
 
     // 店舗情報
@@ -36,7 +49,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 基準月（クエリパラメータ or 今月）
-    const monthParam = url.searchParams.get("month"); // "2026-03" 形式
+    // monthParam は上部キャッシュキー生成で取得済み
     const now = new Date();
     let baseYear = now.getFullYear();
     let baseMonth = now.getMonth(); // 0-indexed
@@ -55,7 +68,7 @@ export async function GET(req: NextRequest) {
     const prevYearEnd = new Date(baseYear - 1, baseMonth + 1, 0);
 
     // 基準週（クエリパラメータ or 今週）: weekStart="2026-03-02" 形式（月曜日）
-    const weekParam = url.searchParams.get("weekStart");
+    // weekParam は上部キャッシュキー生成で取得済み
     let thisWeekStart: Date;
     if (weekParam && /^\d{4}-\d{2}-\d{2}$/.test(weekParam)) {
       const [wy, wm, wd] = weekParam.split("-").map(Number);
@@ -128,21 +141,40 @@ export async function GET(req: NextRequest) {
     const localDateStr = (d: Date) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-    // 期間フィルタ関数（日付文字列で比較してタイムゾーン問題を回避）
+    // 1パスで全期間バケットに振り分け（6回のfilterスキャンを排除）
     type Rec = typeof allRecords[number];
-    const inRange = (r: Rec, from: Date, to: Date) => {
-      const rDate = localDateStr(new Date(r.attendanceDate));
-      const fromStr = localDateStr(from);
-      const toStr = localDateStr(to);
-      return rDate >= fromStr && rDate <= toStr;
+    const thisMonthRecs: Rec[] = [];
+    const lastMonthRecs: Rec[] = [];
+    const prevYearRecs: Rec[] = [];
+    const thisWeekRecs: Rec[] = [];
+    const lastWeekRecs: Rec[] = [];
+    const prevYearWeekRecs: Rec[] = [];
+
+    // 期間境界を事前計算（文字列比較用）
+    const ranges = {
+      tm: [localDateStr(thisMonthStart), localDateStr(thisMonthEnd)],
+      lm: [localDateStr(lastMonthStart), localDateStr(lastMonthEnd)],
+      py: [localDateStr(prevYearStart), localDateStr(prevYearEnd)],
+      tw: [localDateStr(thisWeekStart), localDateStr(thisWeekEnd)],
+      lw: [localDateStr(lastWeekStart), localDateStr(lastWeekEnd)],
+      pyw: [localDateStr(prevYearWeekStart), localDateStr(prevYearWeekEnd)],
     };
 
-    const thisMonthRecs = allRecords.filter(r => inRange(r, thisMonthStart, thisMonthEnd));
-    const lastMonthRecs = allRecords.filter(r => inRange(r, lastMonthStart, lastMonthEnd));
-    const prevYearRecs = allRecords.filter(r => inRange(r, prevYearStart, prevYearEnd));
-    const thisWeekRecs = allRecords.filter(r => inRange(r, thisWeekStart, thisWeekEnd));
-    const lastWeekRecs = allRecords.filter(r => inRange(r, lastWeekStart, lastWeekEnd));
-    const prevYearWeekRecs = allRecords.filter(r => inRange(r, prevYearWeekStart, prevYearWeekEnd));
+    for (const r of allRecords) {
+      const rDate = localDateStr(new Date(r.attendanceDate));
+      if (rDate >= ranges.tm[0] && rDate <= ranges.tm[1]) thisMonthRecs.push(r);
+      if (rDate >= ranges.lm[0] && rDate <= ranges.lm[1]) lastMonthRecs.push(r);
+      if (rDate >= ranges.py[0] && rDate <= ranges.py[1]) prevYearRecs.push(r);
+      if (rDate >= ranges.tw[0] && rDate <= ranges.tw[1]) thisWeekRecs.push(r);
+      if (rDate >= ranges.lw[0] && rDate <= ranges.lw[1]) lastWeekRecs.push(r);
+      if (rDate >= ranges.pyw[0] && rDate <= ranges.pyw[1]) prevYearWeekRecs.push(r);
+    }
+
+    // 期間フィルタ関数（週トレンド用に残す）
+    const inRange = (r: Rec, from: Date, to: Date) => {
+      const rDate = localDateStr(new Date(r.attendanceDate));
+      return rDate >= localDateStr(from) && rDate <= localDateStr(to);
+    };
 
     // 集計ヘルパー
     const summarize = (recs: Rec[]) => {
@@ -362,7 +394,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const result = {
       store: { id: store.id, name: store.name },
       employeeCount: employees.length,
       availableWeeks,
@@ -387,7 +419,13 @@ export async function GET(req: NextRequest) {
       weekDates,
       weeklySchedule,
       byEmploymentType,
-    });
+    };
+
+    // キャッシュに保存（最大50エントリ）
+    if (storeCache.size > 50) storeCache.clear();
+    storeCache.set(cacheKey, { data: result, timestamp: Date.now() });
+
+    return NextResponse.json(result);
   } catch (e) {
     console.error("store-dashboard error:", e);
     return NextResponse.json({ error: String(e) }, { status: 500 });
